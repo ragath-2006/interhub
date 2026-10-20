@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard - InternHub{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Welcome Header Banner -->
+    <div class="app-card p-4 bg-white shadow-sm mb-4 border-start border-primary border-4">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <span class="badge bg-primary-subtle text-primary fw-bold mb-1">Student Portal</span>
+                <h2 class="fw-bold mb-1">Welcome back, {{ profile.full_name }}! 👋</h2>
+                <p class="text-muted mb-0">
+                    {{ profile.department }} • {{ profile.college_name }} • CGPA: <strong>{{ profile.cgpa }}</strong>
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a href="{{ url_for('student_resume') }}" class="btn btn-primary btn-sm me-2">
+                    <i class="bi bi-file-earmark-person me-1"></i> Dynamic Resume
+                </a>
+                <a href="{{ url_for('internships') }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-search me-1"></i> Browse All
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Recommendation Engine Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="fw-bold mb-0 d-flex align-items-center gap-2">
+                <i class="bi bi-stars text-primary"></i> Recommended Internships for You
+            </h4>
+            <p class="text-muted small mb-0">Ranked dynamically by your profile and skills Match Percentage.</p>
+        </div>
+        <a href="{{ url_for('internships') }}" class="btn btn-sm btn-link text-primary fw-bold text-decoration-none">View All Listings →</a>
+    </div>
+
+    <!-- AI Recommended Cards Grid -->
+    <div class="row g-4 mb-5">
+        {% if recommendations %}
+            {% for rec in recommendations %}
+                {% set job = rec.internship %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="app-card card-hoverable p-4 h-100 bg-white d-flex flex-column justify-content-between position-relative">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-light text-dark border">{{ job.domain }}</span>
+                                <span class="ai-badge {% if rec.rf_probability >= 70 %}ai-badge-high{% elif rec.rf_probability >= 40 %}ai-badge-medium{% else %}ai-badge-low{% endif %}">
+                                    <i class="bi bi-stars"></i> {{ rec.rf_probability }}% Match
+                                </span>
+                            </div>
+
+                            <h5 class="fw-bold mb-1">
+                                <a href="{{ url_for('internship_detail', internship_id=job.id) }}" class="text-dark text-decoration-none">
+                                    {{ job.title }}
+                                </a>
+                            </h5>
+                            <p class="text-muted small mb-2">
+                                <i class="bi bi-building"></i> {{ job.company.company_name }} • {{ job.location }}
+                            </p>
+
+                            <!-- Profile Match breakdown -->
+                            <div class="bg-light p-2 rounded-2 mb-3 small">
+                                <div class="d-flex justify-content-between text-muted mb-1">
+                                    <span>Match Percentage:</span>
+                                    <strong class="text-success">{{ rec.rf_probability }}%</strong>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-success" style="width: {{ rec.rf_probability }}%;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Skills overlap preview -->
+                            <div class="mb-3">
+                                <span class="small text-muted d-block mb-1">Matched Skills:</span>
+                                {% for s in rec.skill_overlap.matched[:3] %}
+                                    <span class="skill-tag skill-tag-matched"><i class="bi bi-check"></i> {{ s }}</span>
+                                {% endfor %}
+                                {% if rec.skill_overlap.missing %}
+                                    {% for s in rec.skill_overlap.missing[:2] %}
+                                        <span class="skill-tag skill-tag-missing"><i class="bi bi-x"></i> {{ s }}</span>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-dark small">{{ job.stipend }}</span>
+                            <a href="{{ url_for('internship_detail', internship_id=job.id) }}" class="btn btn-primary btn-sm">
+                                View & Apply
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-4 bg-white app-card">
+                <p class="text-muted mb-0">No new recommendations available. Update your skills in your Dynamic Resume to see new matches!</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Active Applications Tracker -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold mb-0">Recent Applications Status</h4>
+        <a href="{{ url_for('student_applications') }}" class="btn btn-outline-secondary btn-sm">
+            View All Applications ({{ profile.applications|length }})
+        </a>
+    </div>
+
+    <div class="app-card bg-white shadow-sm overflow-hidden mb-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light small text-uppercase">
+                    <tr>
+                        <th>Internship Role</th>
+                        <th>Company</th>
+                        <th>Applied On</th>
+                        <th>AI Match Score</th>
+                        <th>Status</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if applications %}
+                        {% for app in applications %}
+                            <tr>
+                                <td class="fw-bold">
+                                    <a href="{{ url_for('internship_detail', internship_id=app.internship_id) }}" class="text-dark text-decoration-none">
+                                        {{ app.internship.title }}
+                                    </a>
+                                </td>
+                                <td>{{ app.internship.company.company_name }}</td>
+                                <td class="small text-muted">{{ app.applied_at.strftime('%d %b %Y') }}</td>
+                                <td>
+                                    <span class="score-chip bg-primary-subtle text-primary">
+                                        {{ app.rf_probability }}% Match
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="status-badge status-{{ app.status }}">
+                                        {{ app.status }}
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    {% if app.status == 'Completed' %}
+                                        <a href="{{ url_for('add_review', application_id=app.id) }}" class="btn btn-warning btn-sm text-dark fw-bold">
+                                            <i class="bi bi-star-fill me-1"></i> Write Review
+                                        </a>
+                                    {% else %}
+                                        <span class="small text-muted" data-bs-toggle="tooltip" title="Reviews unlock upon internship completion.">
+                                            <i class="bi bi-lock-fill"></i> Review Locked
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                You haven't applied to any internships yet. <a href="{{ url_for('internships') }}">Browse listings</a>.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

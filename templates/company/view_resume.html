@@ -1,0 +1,250 @@
+{% extends 'base.html' %}
+
+{% block title %}Candidate Resume - {{ student.full_name }} | InternHub{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Top Action Bar -->
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print flex-wrap gap-2">
+        <div>
+            <a href="{{ url_for('company_applicants') }}" class="btn btn-outline-secondary btn-sm mb-2">
+                <i class="bi bi-arrow-left me-1"></i> Back to Applicants
+            </a>
+            <h2 class="fw-bold mb-0">Candidate Resume Evaluation</h2>
+            <p class="text-muted small mb-0">Evaluating <strong>{{ student.full_name }}</strong> for <em>{{ internship.title }}</em></p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-dark btn-sm" onclick="window.print()">
+                <i class="bi bi-printer me-1"></i> Print / Save PDF
+            </button>
+            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#statusModal">
+                Update Status (Current: {{ application.status }})
+            </button>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- AI Screening Analysis Sidebar -->
+        <div class="col-lg-4 no-print">
+            <div class="app-card p-4 bg-white shadow-sm mb-4">
+                <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                    <i class="bi bi-person-check text-primary"></i> Candidate Evaluation
+                </h5>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between small fw-bold mb-1">
+                        <span>Recruiting Percentage:</span>
+                        <span class="text-primary fs-6">{{ match_details.tfidf_score }}%</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-primary" style="width: {{ match_details.tfidf_score }}%;"></div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between small fw-bold mb-1">
+                        <span>Candidate Match Percentage:</span>
+                        <span class="text-success fs-6">{{ match_details.rf_probability }}%</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-success" style="width: {{ match_details.rf_probability }}%;"></div>
+                    </div>
+                </div>
+
+                <!-- Skill Matching Details -->
+                <div class="border-top pt-3 mb-3">
+                    <h6 class="fw-bold small mb-2 text-dark">Skill Match Overlap</h6>
+                    <div class="mb-2">
+                        <span class="d-block small text-muted mb-1">Matched Required Skills:</span>
+                        {% for s in match_details.skill_overlap.matched %}
+                            <span class="skill-tag skill-tag-matched"><i class="bi bi-check-lg"></i> {{ s }}</span>
+                        {% else %}
+                            <span class="small text-muted">No direct keywords matched</span>
+                        {% endfor %}
+                    </div>
+                    {% if match_details.skill_overlap.missing %}
+                        <div>
+                            <span class="d-block small text-muted mb-1">Missing Required Skills:</span>
+                            {% for s in match_details.skill_overlap.missing %}
+                                <span class="skill-tag skill-tag-missing"><i class="bi bi-x"></i> {{ s }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if application.cover_letter %}
+                    <div class="border-top pt-3">
+                        <h6 class="fw-bold small mb-1 text-dark">Candidate Cover Note</h6>
+                        <p class="small text-secondary bg-light p-2 rounded-2 mb-0">"{{ application.cover_letter }}"</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Dynamic Resume Paper -->
+        <div class="col-lg-8">
+            <div class="resume-paper bg-white shadow-sm">
+                <!-- Resume Header -->
+                <div class="resume-header text-center">
+                    <h2 class="fw-bold mb-1 text-dark">{{ student.full_name }}</h2>
+                    <p class="text-muted small mb-2">
+                        {% if student.phone %}<i class="bi bi-telephone"></i> {{ student.phone }} • {% endif %}
+                        <i class="bi bi-envelope"></i> {{ student.user.email }} • 
+                        {% if student.location %}<i class="bi bi-geo-alt"></i> {{ student.location }}{% endif %}
+                    </p>
+                    <div class="d-flex justify-content-center gap-3 small">
+                        {% if student.github_url %}
+                            <a href="{{ student.github_url }}" target="_blank" class="text-dark text-decoration-none fw-semibold">
+                                <i class="bi bi-github"></i> GitHub
+                            </a>
+                        {% endif %}
+                        {% if student.linkedin_url %}
+                            <a href="{{ student.linkedin_url }}" target="_blank" class="text-primary text-decoration-none fw-semibold">
+                                <i class="bi bi-linkedin"></i> LinkedIn
+                            </a>
+                        {% endif %}
+                        {% if student.portfolio_url %}
+                            <a href="{{ student.portfolio_url }}" target="_blank" class="text-info text-decoration-none fw-semibold">
+                                <i class="bi bi-globe"></i> Portfolio
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Bio -->
+                {% if student.bio %}
+                    <div class="mb-3">
+                        <div class="resume-section-title">Professional Summary</div>
+                        <p class="small text-secondary mb-0">{{ student.bio }}</p>
+                    </div>
+                {% endif %}
+
+                <!-- Skills -->
+                <div class="mb-3">
+                    <div class="resume-section-title">Technical & Soft Skills</div>
+                    <div class="small mb-1">
+                        <strong>Technical Skills:</strong> {{ student.technical_skills or 'Not specified' }}
+                    </div>
+                    {% if student.soft_skills %}
+                        <div class="small">
+                            <strong>Soft Skills:</strong> {{ student.soft_skills }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Education -->
+                <div class="mb-3">
+                    <div class="resume-section-title">Education</div>
+                    {% if student.educations %}
+                        {% for edu in student.educations %}
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <strong class="d-block text-dark small">{{ edu.degree }}</strong>
+                                    <span class="text-muted small">{{ edu.institution }} {% if edu.grade_or_cgpa %}• CGPA/Grade: {{ edu.grade_or_cgpa }}{% endif %}</span>
+                                </div>
+                                <span class="small text-muted">{{ edu.start_year }} - {{ edu.end_year or 'Present' }}</span>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="small text-muted mb-0">No education recorded.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Projects -->
+                <div class="mb-3">
+                    <div class="resume-section-title">Projects</div>
+                    {% if student.projects %}
+                        {% for proj in student.projects %}
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <strong class="text-dark small">{{ proj.title }}</strong>
+                                    {% if proj.project_url %}
+                                        <a href="{{ proj.project_url }}" target="_blank" class="small text-decoration-none"><i class="bi bi-link-45deg"></i> Project Link</a>
+                                    {% endif %}
+                                </div>
+                                {% if proj.technologies %}
+                                    <div class="text-primary small mb-1">{{ proj.technologies }}</div>
+                                {% endif %}
+                                <p class="small text-secondary mb-0">{{ proj.description }}</p>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="small text-muted mb-0">No projects added.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Experience -->
+                <div class="mb-3">
+                    <div class="resume-section-title">Experience & Internships</div>
+                    {% if student.experiences %}
+                        {% for exp in student.experiences %}
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <strong class="text-dark small">{{ exp.title }}</strong>
+                                    <span class="small text-muted">{{ exp.start_date }} - {{ exp.end_date or 'Present' }}</span>
+                                </div>
+                                <div class="text-muted small mb-1">{{ exp.company_name }}</div>
+                                <p class="small text-secondary mb-0">{{ exp.description }}</p>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="small text-muted mb-0">No prior experience listed.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Certifications -->
+                <div>
+                    <div class="resume-section-title">Certifications</div>
+                    {% if student.certifications %}
+                        {% for cert in student.certifications %}
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small text-dark"><strong>{{ cert.title }}</strong> — {{ cert.issuing_organization }}</span>
+                                <span class="small text-muted">{{ cert.issue_date }}</span>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="small text-muted mb-0">No certifications recorded.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Status Update Modal -->
+<div class="modal fade no-print" id="statusModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Update Candidate Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('update_applicant_status', app_id=application.id) }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Application Status</label>
+                        <select name="status" class="form-select">
+                            <option value="Applied" {% if application.status == 'Applied' %}selected{% endif %}>Applied</option>
+                            <option value="Under Review" {% if application.status == 'Under Review' %}selected{% endif %}>Under Review</option>
+                            <option value="Shortlisted" {% if application.status == 'Shortlisted' %}selected{% endif %}>Shortlisted</option>
+                            <option value="Selected" {% if application.status == 'Selected' %}selected{% endif %}>Selected / Hired</option>
+                            <option value="Completed" {% if application.status == 'Completed' %}selected{% endif %}>Completed (Internship finished)</option>
+                            <option value="Rejected" {% if application.status == 'Rejected' %}selected{% endif %}>Rejected</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Recruiter Feedback Note</label>
+                        <textarea name="company_notes" class="form-control" rows="2">{{ application.company_notes or '' }}</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Update & Notify</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

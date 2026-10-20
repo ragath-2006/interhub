@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Received Reviews - InternHub{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold mb-1">Company Feedback & Verified Reviews</h2>
+            <p class="text-muted mb-0">Ratings submitted by verified interns who completed their tenure at {{ company.company_name }}.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="fs-4 fw-bold text-dark">{{ company.average_rating }}</span>
+            <div class="star-rating">
+                {% for i in range(5) %}
+                    {% if i < company.average_rating|int %}
+                        <i class="bi bi-star-fill"></i>
+                    {% else %}
+                        <i class="bi bi-star text-muted"></i>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <span class="text-muted small">({{ company.total_reviews }} Reviews)</span>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {% if reviews %}
+            {% for r in reviews %}
+                <div class="col-lg-6">
+                    <div class="app-card p-4 h-100 bg-white shadow-sm d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <div class="star-rating">
+                                        {% for i in range(r.rating) %}
+                                            <i class="bi bi-star-fill"></i>
+                                        {% endfor %}
+                                    </div>
+                                    <h6 class="fw-bold mt-2 text-dark">"{{ r.title }}"</h6>
+                                </div>
+                                <small class="text-muted">{{ r.created_at.strftime('%d %b %Y') }}</small>
+                            </div>
+
+                            <p class="text-secondary small mb-3">{{ r.review_text }}</p>
+
+                            {% if r.pros %}
+                                <div class="small mb-1"><strong class="text-success">Pros:</strong> {{ r.pros }}</div>
+                            {% endif %}
+                            {% if r.cons %}
+                                <div class="small mb-3"><strong class="text-danger">Cons:</strong> {{ r.cons }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row g-2 text-center border-top pt-2 small text-muted bg-light rounded-2 mt-2">
+                            <div class="col-4">Culture: <strong>{{ r.work_environment_rating }}/5</strong></div>
+                            <div class="col-4 border-start border-end">Learning: <strong>{{ r.learning_rating }}/5</strong></div>
+                            <div class="col-4">Mentorship: <strong>{{ r.mentor_support_rating }}/5</strong></div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-5 app-card bg-white">
+                <i class="bi bi-star display-4 text-muted"></i>
+                <h5 class="fw-bold mt-3">No reviews received yet</h5>
+                <p class="text-muted small">As candidates finish their internships and are marked as 'Completed', their feedback will appear here.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

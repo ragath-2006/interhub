@@ -1,0 +1,368 @@
+{% extends 'base.html' %}
+
+{% block title %}Dynamic Resume Builder - InternHub{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Top Action Bar -->
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold mb-1">Single Dynamic Resume</h2>
+            <p class="text-muted mb-0">Update your unified dynamic profile. Changes instantly reflect in all AI recommendations and active company applications.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-dark btn-sm" onclick="window.print()">
+                <i class="bi bi-printer me-1"></i> Print / Download PDF
+            </button>
+            <a href="{{ url_for('student_dashboard') }}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Editor Column (Hidden during Print) -->
+        <div class="col-lg-5 no-print">
+            <div class="app-card p-4 bg-white shadow-sm mb-4">
+                <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                    <i class="bi bi-sliders text-primary"></i> Profile & Skills Editor
+                </h5>
+
+                <!-- Main Profile Form -->
+                <form action="{{ url_for('student_resume') }}" method="POST" class="mb-4">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Full Name</label>
+                        <input type="text" name="full_name" value="{{ profile.full_name }}" class="form-control form-control-sm" required>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Phone Number</label>
+                            <input type="text" name="phone" value="{{ profile.phone or '' }}" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Current CGPA</label>
+                            <input type="number" step="0.01" min="0" max="10" name="cgpa" value="{{ profile.cgpa }}" class="form-control form-control-sm" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">College / University</label>
+                            <input type="text" name="college_name" value="{{ profile.college_name or '' }}" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Department / Major</label>
+                            <input type="text" name="department" value="{{ profile.department or '' }}" class="form-control form-control-sm">
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Year of Study</label>
+                            <input type="text" name="year_of_study" value="{{ profile.year_of_study or '' }}" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Location / City</label>
+                            <input type="text" name="location" value="{{ profile.location or '' }}" class="form-control form-control-sm">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Professional Summary / Bio</label>
+                        <textarea name="bio" class="form-control form-control-sm" rows="3">{{ profile.bio or '' }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Technical Skills (comma-separated)</label>
+                        <textarea name="technical_skills" class="form-control form-control-sm" rows="2" placeholder="e.g. Python, Flask, React, SQL, Machine Learning">{{ profile.technical_skills or '' }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Soft Skills (comma-separated)</label>
+                        <input type="text" name="soft_skills" value="{{ profile.soft_skills or '' }}" class="form-control form-control-sm" placeholder="e.g. Communication, Problem Solving, Leadership">
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">GitHub URL</label>
+                            <input type="url" name="github_url" value="{{ profile.github_url or '' }}" class="form-control form-control-sm" placeholder="https://github.com/...">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">LinkedIn URL</label>
+                            <input type="url" name="linkedin_url" value="{{ profile.linkedin_url or '' }}" class="form-control form-control-sm" placeholder="https://linkedin.com/in/...">
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-sm">Save Profile Changes</button>
+                    </div>
+                </form>
+
+                <hr class="my-4">
+
+                <!-- Dynamic Sections Management Accordion -->
+                <div class="accordion" id="resumeAccordion">
+                    <!-- Add Education -->
+                    <div class="accordion-item border-0 mb-2 shadow-sm rounded-3 overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold py-2" type="button" data-bs-toggle="collapse" data-bs-target="#eduCollapse">
+                                <i class="bi bi-mortarboard text-primary me-2"></i> Add Education
+                            </button>
+                        </h2>
+                        <div id="eduCollapse" class="accordion-collapse collapse" data-bs-parent="#resumeAccordion">
+                            <div class="accordion-body bg-light">
+                                <form action="{{ url_for('add_education') }}" method="POST">
+                                    <div class="mb-2">
+                                        <input type="text" name="degree" class="form-control form-control-sm" placeholder="Degree (e.g. B.Tech in CSE)" required>
+                                    </div>
+                                    <div class="mb-2">
+                                        <input type="text" name="institution" class="form-control form-control-sm" placeholder="Institution / College" required>
+                                    </div>
+                                    <div class="row g-2 mb-2">
+                                        <div class="col-6"><input type="text" name="start_year" class="form-control form-control-sm" placeholder="Start Year"></div>
+                                        <div class="col-6"><input type="text" name="end_year" class="form-control form-control-sm" placeholder="End Year"></div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <input type="text" name="grade_or_cgpa" class="form-control form-control-sm" placeholder="Grade / CGPA">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm w-100">+ Add Education</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add Project -->
+                    <div class="accordion-item border-0 mb-2 shadow-sm rounded-3 overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold py-2" type="button" data-bs-toggle="collapse" data-bs-target="#projCollapse">
+                                <i class="bi bi-code-square text-primary me-2"></i> Add Project
+                            </button>
+                        </h2>
+                        <div id="projCollapse" class="accordion-collapse collapse" data-bs-parent="#resumeAccordion">
+                            <div class="accordion-body bg-light">
+                                <form action="{{ url_for('add_project') }}" method="POST">
+                                    <div class="mb-2">
+                                        <input type="text" name="title" class="form-control form-control-sm" placeholder="Project Title" required>
+                                    </div>
+                                    <div class="mb-2">
+                                        <input type="text" name="technologies" class="form-control form-control-sm" placeholder="Technologies (e.g. Python, Flask, React)">
+                                    </div>
+                                    <div class="mb-2">
+                                        <input type="url" name="project_url" class="form-control form-control-sm" placeholder="Project / GitHub Link">
+                                    </div>
+                                    <div class="mb-2">
+                                        <textarea name="description" class="form-control form-control-sm" rows="2" placeholder="Brief project description & achievements..."></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm w-100">+ Add Project</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add Experience -->
+                    <div class="accordion-item border-0 mb-2 shadow-sm rounded-3 overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold py-2" type="button" data-bs-toggle="collapse" data-bs-target="#expCollapse">
+                                <i class="bi bi-briefcase text-primary me-2"></i> Add Experience
+                            </button>
+                        </h2>
+                        <div id="expCollapse" class="accordion-collapse collapse" data-bs-parent="#resumeAccordion">
+                            <div class="accordion-body bg-light">
+                                <form action="{{ url_for('add_experience') }}" method="POST">
+                                    <div class="mb-2">
+                                        <input type="text" name="title" class="form-control form-control-sm" placeholder="Job / Role Title" required>
+                                    </div>
+                                    <div class="mb-2">
+                                        <input type="text" name="company_name" class="form-control form-control-sm" placeholder="Company Name" required>
+                                    </div>
+                                    <div class="row g-2 mb-2">
+                                        <div class="col-6"><input type="text" name="start_date" class="form-control form-control-sm" placeholder="Start Date"></div>
+                                        <div class="col-6"><input type="text" name="end_date" class="form-control form-control-sm" placeholder="End Date"></div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <textarea name="description" class="form-control form-control-sm" rows="2" placeholder="Key contributions & responsibilities..."></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm w-100">+ Add Experience</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add Certification -->
+                    <div class="accordion-item border-0 mb-2 shadow-sm rounded-3 overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold py-2" type="button" data-bs-toggle="collapse" data-bs-target="#certCollapse">
+                                <i class="bi bi-award text-primary me-2"></i> Add Certification
+                            </button>
+                        </h2>
+                        <div id="certCollapse" class="accordion-collapse collapse" data-bs-parent="#resumeAccordion">
+                            <div class="accordion-body bg-light">
+                                <form action="{{ url_for('add_certification') }}" method="POST">
+                                    <div class="mb-2">
+                                        <input type="text" name="title" class="form-control form-control-sm" placeholder="Certification Title" required>
+                                    </div>
+                                    <div class="mb-2">
+                                        <input type="text" name="issuing_organization" class="form-control form-control-sm" placeholder="Issuing Org (e.g. AWS, Coursera)" required>
+                                    </div>
+                                    <div class="mb-2">
+                                        <input type="text" name="issue_date" class="form-control form-control-sm" placeholder="Issue Date (e.g. Jan 2026)">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm w-100">+ Add Certification</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Dynamic Resume Preview Column -->
+        <div class="col-lg-7">
+            <div class="resume-paper bg-white shadow-sm">
+                <!-- Resume Header -->
+                <div class="resume-header text-center">
+                    <h2 class="fw-bold mb-1 text-dark">{{ profile.full_name }}</h2>
+                    <p class="text-muted small mb-2">
+                        {% if profile.phone %}<i class="bi bi-telephone"></i> {{ profile.phone }} • {% endif %}
+                        <i class="bi bi-envelope"></i> {{ profile.user.email }} • 
+                        {% if profile.location %}<i class="bi bi-geo-alt"></i> {{ profile.location }}{% endif %}
+                    </p>
+                    <div class="d-flex justify-content-center gap-3 small">
+                        {% if profile.github_url %}
+                            <a href="{{ profile.github_url }}" target="_blank" class="text-dark text-decoration-none fw-semibold">
+                                <i class="bi bi-github"></i> GitHub
+                            </a>
+                        {% endif %}
+                        {% if profile.linkedin_url %}
+                            <a href="{{ profile.linkedin_url }}" target="_blank" class="text-primary text-decoration-none fw-semibold">
+                                <i class="bi bi-linkedin"></i> LinkedIn
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Professional Summary -->
+                {% if profile.bio %}
+                    <div class="mb-3">
+                        <div class="resume-section-title">Professional Summary</div>
+                        <p class="small text-secondary mb-0" style="line-height: 1.6;">{{ profile.bio }}</p>
+                    </div>
+                {% endif %}
+
+                <!-- Technical Skills -->
+                <div class="mb-3">
+                    <div class="resume-section-title">Technical & Soft Skills</div>
+                    <div class="small mb-1">
+                        <strong>Technical Skills:</strong> {{ profile.technical_skills or 'Not specified' }}
+                    </div>
+                    {% if profile.soft_skills %}
+                        <div class="small">
+                            <strong>Soft Skills:</strong> {{ profile.soft_skills }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Education Section -->
+                <div class="mb-3">
+                    <div class="resume-section-title">Education</div>
+                    {% if profile.educations %}
+                        {% for edu in profile.educations %}
+                            <div class="d-flex justify-content-between align-items-start mb-2 position-relative">
+                                <div>
+                                    <strong class="d-block text-dark small">{{ edu.degree }}</strong>
+                                    <span class="text-muted small">{{ edu.institution }} {% if edu.grade_or_cgpa %}• CGPA/Grade: {{ edu.grade_or_cgpa }}{% endif %}</span>
+                                </div>
+                                <div class="text-end">
+                                    <span class="small text-muted">{{ edu.start_year }} - {{ edu.end_year or 'Present' }}</span>
+                                    <form action="{{ url_for('delete_education', id=edu.id) }}" method="POST" class="d-inline no-print">
+                                        <button type="submit" class="btn btn-link btn-sm text-danger p-0 ms-2" title="Delete"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="small text-muted mb-0">No education entries added yet.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Projects Section -->
+                <div class="mb-3">
+                    <div class="resume-section-title">Key Projects</div>
+                    {% if profile.projects %}
+                        {% for proj in profile.projects %}
+                            <div class="mb-3 position-relative">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <strong class="text-dark small">{{ proj.title }}</strong>
+                                        {% if proj.technologies %}
+                                            <span class="text-primary small">({{ proj.technologies }})</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="no-print">
+                                        {% if proj.project_url %}
+                                            <a href="{{ proj.project_url }}" target="_blank" class="small text-decoration-none me-2"><i class="bi bi-link-45deg"></i> Link</a>
+                                        {% endif %}
+                                        <form action="{{ url_for('delete_project', id=proj.id) }}" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-link btn-sm text-danger p-0" title="Delete"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <p class="small text-secondary mb-0 mt-1">{{ proj.description }}</p>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="small text-muted mb-0">No projects added yet.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Experience Section -->
+                <div class="mb-3">
+                    <div class="resume-section-title">Internships & Work Experience</div>
+                    {% if profile.experiences %}
+                        {% for exp in profile.experiences %}
+                            <div class="mb-3 position-relative">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <strong class="text-dark small">{{ exp.title }}</strong>
+                                        <span class="text-muted small">at {{ exp.company_name }}</span>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="small text-muted">{{ exp.start_date }} - {{ exp.end_date or 'Present' }}</span>
+                                        <form action="{{ url_for('delete_experience', id=exp.id) }}" method="POST" class="d-inline no-print">
+                                            <button type="submit" class="btn btn-link btn-sm text-danger p-0 ms-2" title="Delete"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <p class="small text-secondary mb-0 mt-1">{{ exp.description }}</p>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="small text-muted mb-0">No experience records added yet.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Certifications Section -->
+                <div>
+                    <div class="resume-section-title">Certifications & Credentials</div>
+                    {% if profile.certifications %}
+                        {% for cert in profile.certifications %}
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small text-dark"><strong>{{ cert.title }}</strong> — {{ cert.issuing_organization }}</span>
+                                <div class="text-end">
+                                    <span class="small text-muted">{{ cert.issue_date }}</span>
+                                    <form action="{{ url_for('delete_certification', id=cert.id) }}" method="POST" class="d-inline no-print">
+                                        <button type="submit" class="btn btn-link btn-sm text-danger p-0 ms-2" title="Delete"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="small text-muted mb-0">No certifications added yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

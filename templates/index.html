@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}InternHub - Find Internships & AI Career Matching{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container position-relative py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-9 col-xl-8 text-center">
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-20 text-white mb-3">
+                    <i class="bi bi-stars text-warning"></i>
+                    <span class="small fw-semibold">Intelligent Skill Matching & Candidate Recruitment</span>
+                </div>
+                <h1 class="display-4 fw-extrabold text-white lh-sm mb-4">
+                    Land Your Dream Internship with <span class="text-info">Intelligent Matching</span>
+                </h1>
+                <p class="lead text-light text-opacity-75 mb-4 mx-auto" style="max-width: 720px;">
+                    Build a single dynamic resume, discover tailored opportunities with high Match Percentage, and read transparent reviews from verified completed interns.
+                </p>
+                
+                <!-- Quick Search Bar -->
+                <div class="card p-2 border-0 shadow-lg rounded-4 bg-white text-start mb-4 mx-auto" style="max-width: 780px;">
+                    <form action="{{ url_for('internships') }}" method="GET" class="d-flex flex-column flex-md-row gap-2">
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-0"><i class="bi bi-search text-muted"></i></span>
+                            <input type="text" name="search" class="form-control border-0 shadow-none" placeholder="Role, Skills (e.g. Python, React)...">
+                        </div>
+                        <div class="input-group border-start-md">
+                            <span class="input-group-text bg-transparent border-0"><i class="bi bi-geo-alt text-muted"></i></span>
+                            <input type="text" name="location" class="form-control border-0 shadow-none" placeholder="Location or Remote">
+                        </div>
+                        <button type="submit" class="btn btn-primary px-4 py-2 text-nowrap rounded-3">
+                            Search Internships
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Fast Highlights -->
+                <div class="d-flex flex-wrap justify-content-center gap-4 text-light text-opacity-90">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                        <span>1 Single Dynamic Resume</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                        <span>High Match Percentage</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                        <span>Verified Reviews Only</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Counters -->
+<section class="py-4 bg-white border-bottom">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-md-4">
+                <h2 class="fw-extrabold text-primary mb-0">{{ total_internships }}+</h2>
+                <p class="text-muted small mb-0">Active Verified Internships</p>
+            </div>
+            <div class="col-md-4 border-start border-end">
+                <h2 class="fw-extrabold text-success mb-0">{{ total_students }}+</h2>
+                <p class="text-muted small mb-0">Registered Student Resumes</p>
+            </div>
+            <div class="col-md-4">
+                <h2 class="fw-extrabold text-info mb-0">{{ total_companies }}+</h2>
+                <p class="text-muted small mb-0">Partner Tech Companies</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Internships Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h6 class="text-primary fw-bold text-uppercase mb-1">Explore Opportunities</h6>
+                <h2 class="fw-bold mb-0">Featured Tech Internships</h2>
+            </div>
+            <a href="{{ url_for('internships') }}" class="btn btn-outline-primary btn-sm">
+                View All Listings <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for item in featured_internships %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="app-card card-hoverable p-4 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-light text-dark border">{{ item.domain }}</span>
+                                <span class="badge bg-success-subtle text-success fw-bold">{{ item.work_mode }}</span>
+                            </div>
+                            <h5 class="fw-bold mb-1">
+                                <a href="{{ url_for('internship_detail', internship_id=item.id) }}" class="text-dark text-decoration-none hover-primary">
+                                    {{ item.title }}
+                                </a>
+                            </h5>
+                            <p class="text-muted small mb-3">
+                                <i class="bi bi-building me-1"></i> {{ item.company.company_name }} • 
+                                <i class="bi bi-geo-alt me-1"></i> {{ item.location }}
+                            </p>
+
+                            <div class="mb-3">
+                                {% for skill in item.required_skills.split(',')[:4] %}
+                                    <span class="skill-tag">{{ skill.strip() }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="text-muted small d-block">Stipend</span>
+                                <span class="fw-bold text-dark">{{ item.stipend }}</span>
+                            </div>
+                            <a href="{{ url_for('internship_detail', internship_id=item.id) }}" class="btn btn-primary btn-sm">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Company Reviews Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h6 class="text-warning fw-bold text-uppercase mb-1">Transparency & Trust</h6>
+                <h2 class="fw-bold mb-0">Verified Student Reviews</h2>
+                <p class="text-muted small mb-0">Only students who complete verified internships can leave company reviews.</p>
+            </div>
+            <a href="{{ url_for('reviews') }}" class="btn btn-outline-dark btn-sm">
+                See All Reviews <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for r in latest_reviews %}
+                <div class="col-lg-6">
+                    <div class="app-card p-4 h-100 bg-white shadow-sm">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="fw-bold mb-0">{{ r.company.company_name }}</h6>
+                                <span class="badge bg-success-subtle text-success small"><i class="bi bi-patch-check-fill"></i> Completed Intern Verified</span>
+                            </div>
+                            <div class="star-rating">
+                                {% for i in range(r.rating) %}
+                                    <i class="bi bi-star-fill"></i>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <h6 class="fw-bold mt-2 text-dark">"{{ r.title }}"</h6>
+                        <p class="text-muted small mb-3">
+                            {{ r.review_text[:180] }}{% if r.review_text|length > 180 %}...{% endif %}
+                        </p>
+
+                        <div class="row g-2 text-center border-top pt-2 small text-muted">
+                            <div class="col-4">Work Culture: <strong>{{ r.work_environment_rating }}/5</strong></div>
+                            <div class="col-4 border-start border-end">Learning: <strong>{{ r.learning_rating }}/5</strong></div>
+                            <div class="col-4">Mentorship: <strong>{{ r.mentor_support_rating }}/5</strong></div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Banner -->
+<section class="py-5 bg-primary text-white text-center">
+    <div class="container py-3">
+        <h2 class="display-6 fw-bold mb-3">Ready to Accelerate Your Career?</h2>
+        <p class="lead text-white text-opacity-75 mb-4 max-w-2xl mx-auto">
+            Create your dynamic resume in under 3 minutes and discover tailored internship recommendations.
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{{ url_for('register_student') }}" class="btn btn-light btn-lg fw-bold text-primary px-4">
+                Build Dynamic Resume
+            </a>
+            <a href="{{ url_for('register_company') }}" class="btn btn-outline-light btn-lg fw-bold px-4">
+                Hire Interns
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

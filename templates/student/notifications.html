@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications - InternHub{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold mb-0"><i class="bi bi-bell-fill text-primary"></i> Notification Center</h2>
+                <span class="badge bg-light text-dark border">{{ notifications|length }} Updates</span>
+            </div>
+
+            <div class="app-card bg-white shadow-sm overflow-hidden">
+                {% if notifications %}
+                    <div class="list-group list-group-flush">
+                        {% for n in notifications %}
+                            <div class="list-group-item p-3 border-bottom {% if not n.is_read %}bg-primary-subtle bg-opacity-25{% endif %}">
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <h6 class="fw-bold mb-0 text-dark">
+                                        {% if n.category == 'success' %}
+                                            <i class="bi bi-check-circle-fill text-success me-1"></i>
+                                        {% elif n.category == 'warning' %}
+                                            <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i>
+                                        {% elif n.category == 'status' %}
+                                            <i class="bi bi-patch-check-fill text-info me-1"></i>
+                                        {% else %}
+                                            <i class="bi bi-info-circle-fill text-primary me-1"></i>
+                                        {% endif %}
+                                        {{ n.title }}
+                                    </h6>
+                                    <small class="text-muted">{{ n.created_at.strftime('%d %b, %I:%M %p') }}</small>
+                                </div>
+                                <p class="small text-secondary mb-2">{{ n.message }}</p>
+                                {% if n.link %}
+                                    <a href="{{ n.link }}" class="btn btn-outline-primary btn-sm py-0 px-2 small">
+                                        View Details <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-bell-slash display-4 text-muted"></i>
+                        <h5 class="fw-bold mt-3">No notifications right now</h5>
+                        <p class="text-muted small">You will receive alerts here when companies review your dynamic resume.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

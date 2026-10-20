@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Sign Up - InternHub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-9">
+            <div class="app-card p-4 p-md-5 bg-white shadow-lg border-0">
+                <div class="text-center mb-4">
+                    <span class="badge bg-primary-subtle text-primary fw-bold mb-2">Student Portal</span>
+                    <h3 class="fw-bold mb-1">Create Your Student Account</h3>
+                    <p class="text-muted small">Build your dynamic resume and discover top internships with match percentage ranking.</p>
+                </div>
+
+                <form method="POST">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Full Name *</label>
+                            <input type="text" name="full_name" class="form-control" required placeholder="e.g. Rahul Sharma">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Email Address *</label>
+                            <input type="email" name="email" class="form-control" required placeholder="rahul@example.com">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Password *</label>
+                            <input type="password" name="password" class="form-control" required placeholder="••••••••">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Current CGPA (out of 10) *</label>
+                            <input type="number" step="0.01" min="0" max="10" name="cgpa" class="form-control" required placeholder="e.g. 8.5">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">College / University Name</label>
+                            <input type="text" name="college_name" class="form-control" placeholder="e.g. National Institute of Technology">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Department / Major</label>
+                            <input type="text" name="department" class="form-control" placeholder="e.g. Computer Science">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Year of Study</label>
+                        <select name="year_of_study" class="form-select">
+                            <option value="1st Year">1st Year</option>
+                            <option value="2nd Year">2nd Year</option>
+                            <option value="3rd Year" selected>3rd Year</option>
+                            <option value="Final Year">Final Year</option>
+                            <option value="Postgraduate">Postgraduate</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold">Initial Technical Skills (comma-separated)</label>
+                        <input type="text" name="technical_skills" class="form-control" placeholder="e.g. Python, Flask, React, SQL, Machine Learning">
+                        <small class="text-muted">You can add detailed projects, certifications, and experience in your dynamic resume builder after signup.</small>
+                    </div>
+
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-primary py-2 fw-semibold">
+                            Register & Launch Resume Builder
+                        </button>
+                    </div>
+
+                    <div class="text-center small text-muted">
+                        Already have an account? <a href="{{ url_for('login') }}" class="text-primary fw-semibold">Log In</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

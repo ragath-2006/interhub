@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}My Applications - InternHub{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold mb-1">My Internship Applications</h2>
+            <p class="text-muted mb-0">Track real-time recruitment lifecycle and unlock verified reviews upon completion.</p>
+        </div>
+        <a href="{{ url_for('internships') }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-search me-1"></i> Explore More Internships
+        </a>
+    </div>
+
+    <!-- Review Policy Callout Banner -->
+    <div class="alert alert-warning border-0 shadow-sm d-flex align-items-center gap-3 mb-4">
+        <i class="bi bi-shield-check fs-3 text-warning"></i>
+        <div>
+            <strong class="d-block text-dark">Verified Review Policy</strong>
+            <span class="small text-secondary">
+                To maintain authentic and tamper-proof ratings, students are only permitted to review a company <strong>after the internship status is marked as "Completed"</strong>.
+            </span>
+        </div>
+    </div>
+
+    <!-- Applications List -->
+    <div class="row g-4">
+        {% if applications %}
+            {% for app in applications %}
+                <div class="col-12">
+                    <div class="app-card p-4 bg-white shadow-sm border-start border-4 {% if app.status == 'Completed' %}border-success{% elif app.status == 'Shortlisted' or app.status == 'Selected' %}border-primary{% elif app.status == 'Rejected' %}border-danger{% else %}border-warning{% endif %}">
+                        <div class="row align-items-center g-3">
+                            <div class="col-lg-5 col-md-6">
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <span class="badge bg-light text-dark border">{{ app.internship.domain }}</span>
+                                    <span class="status-badge status-{{ app.status }}">
+                                        {{ app.status }}
+                                    </span>
+                                </div>
+                                <h5 class="fw-bold mb-1">
+                                    <a href="{{ url_for('internship_detail', internship_id=app.internship_id) }}" class="text-dark text-decoration-none">
+                                        {{ app.internship.title }}
+                                    </a>
+                                </h5>
+                                <p class="text-muted small mb-0">
+                                    <i class="bi bi-building"></i> {{ app.internship.company.company_name }} • 
+                                    <i class="bi bi-geo-alt"></i> {{ app.internship.location }}
+                                </p>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <div class="d-flex gap-2 mb-1">
+                                    <span class="ai-badge ai-badge-high">
+                                        <i class="bi bi-stars"></i> {{ app.rf_probability }}% Match Percentage
+                                    </span>
+                                </div>
+                                <div class="small text-muted">
+                                    Applied on: <strong>{{ app.applied_at.strftime('%d %b %Y, %I:%M %p') }}</strong>
+                                </div>
+                                {% if app.company_notes %}
+                                    <div class="small text-dark mt-1 bg-light p-2 rounded-2">
+                                        <i class="bi bi-chat-left-dots text-primary me-1"></i> <em>"{{ app.company_notes }}"</em>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-lg-3 col-md-12 text-lg-end">
+                                {% if app.status == 'Completed' %}
+                                    {% if app.internship.company_id in reviewed_company_ids %}
+                                        <a href="{{ url_for('reviews', company_id=app.internship.company_id) }}" class="btn btn-outline-success btn-sm w-100">
+                                            <i class="bi bi-check2-circle me-1"></i> Review Submitted
+                                        </a>
+                                    {% else %}
+                                        <a href="{{ url_for('add_review', application_id=app.id) }}" class="btn btn-warning btn-sm text-dark fw-bold w-100 shadow-sm">
+                                            <i class="bi bi-star-fill me-1"></i> Write Company Review
+                                        </a>
+                                    {% endif %}
+                                {% else %}
+                                    <button class="btn btn-light btn-sm text-muted w-100" disabled data-bs-toggle="tooltip" title="Reviews will unlock once the employer marks your internship status as Completed.">
+                                        <i class="bi bi-lock me-1"></i> Review Locked ({{ app.status }})
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-5 app-card bg-white">
+                <i class="bi bi-inbox display-4 text-muted"></i>
+                <h5 class="fw-bold mt-3">No applications submitted yet</h5>
+                <p class="text-muted small">Explore curated internships and apply using your dynamic resume.</p>
+                <a href="{{ url_for('internships') }}" class="btn btn-primary btn-sm">Find Internships</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

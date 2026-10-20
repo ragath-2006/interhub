@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Employer Sign Up - InternHub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-9">
+            <div class="app-card p-4 p-md-5 bg-white shadow-lg border-0">
+                <div class="text-center mb-4">
+                    <span class="badge bg-dark-subtle text-dark fw-bold mb-2">Employer Portal</span>
+                    <h3 class="fw-bold mb-1">Register as a Company</h3>
+                    <p class="text-muted small">Post internships and discover top candidates ranked by recruiting percentage.</p>
+                </div>
+
+                <form method="POST">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Company / Organization Name *</label>
+                            <input type="text" name="company_name" class="form-control" required placeholder="e.g. Acme Technologies">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Work Email Address *</label>
+                            <input type="email" name="email" class="form-control" required placeholder="talent@acme.com">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Password *</label>
+                            <input type="password" name="password" class="form-control" required placeholder="••••••••">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Industry / Domain</label>
+                            <input type="text" name="industry" class="form-control" placeholder="e.g. Software & AI, FinTech, E-Commerce">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Headquarters / Location</label>
+                            <input type="text" name="location" class="form-control" placeholder="e.g. Bengaluru, India">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Website URL</label>
+                            <input type="url" name="website" class="form-control" placeholder="https://acme.com">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Contact Person / Recruiter Name</label>
+                        <input type="text" name="contact_person" class="form-control" placeholder="e.g. HR Talent Lead">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold">Company Overview / Description</label>
+                        <textarea name="description" class="form-control" rows="3" placeholder="Briefly describe your company's mission and engineering culture..."></textarea>
+                    </div>
+
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-primary py-2 fw-semibold">
+                            Register Company
+                        </button>
+                    </div>
+
+                    <div class="text-center small text-muted">
+                        Already registered? <a href="{{ url_for('login') }}" class="text-primary fw-semibold">Log In</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

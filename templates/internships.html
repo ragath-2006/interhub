@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Internships - InternHub{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-7">
+            <h2 class="fw-bold mb-1">Discover Tech Internships</h2>
+            <p class="text-muted mb-0">
+                Filter by domain, work mode, stipend (paid/unpaid), and skills.
+                {% if current_user and current_user.role == 'student' %}
+                    <span class="text-primary fw-semibold"><i class="bi bi-robot"></i> AI match scores computed against your dynamic resume.</span>
+                {% endif %}
+            </p>
+        </div>
+        <div class="col-md-5 text-md-end mt-3 mt-md-0">
+            {% if current_user and current_user.role == 'student' %}
+                <a href="{{ url_for('student_resume') }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-pencil-square me-1"></i> Update Dynamic Resume
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Filters Card -->
+    <div class="app-card p-3 mb-4 bg-white shadow-sm">
+        <form action="{{ url_for('internships') }}" method="GET" class="row g-2 align-items-center">
+            <div class="col-lg-3 col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="Search title, skills...">
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <select name="domain" class="form-select">
+                    <option value="">All Domains</option>
+                    {% for d in domains %}
+                        <option value="{{ d }}" {% if selected_domain == d %}selected{% endif %}>{{ d }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <select name="stipend_type" class="form-select">
+                    <option value="">All Stipends</option>
+                    <option value="paid" {% if selected_stipend_type == 'paid' %}selected{% endif %}>💰 Paid Only</option>
+                    <option value="unpaid" {% if selected_stipend_type == 'unpaid' %}selected{% endif %}>🌱 Unpaid / Unstipended</option>
+                </select>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <select name="work_mode" class="form-select">
+                    <option value="">All Modes</option>
+                    <option value="Remote" {% if selected_mode == 'Remote' %}selected{% endif %}>Remote</option>
+                    <option value="Hybrid" {% if selected_mode == 'Hybrid' %}selected{% endif %}>Hybrid</option>
+                    <option value="On-site" {% if selected_mode == 'On-site' %}selected{% endif %}>On-site</option>
+                </select>
+            </div>
+            <div class="col-lg-1 col-md-4">
+                <input type="text" name="location" value="{{ location }}" class="form-control" placeholder="City">
+            </div>
+            <div class="col-lg-1 col-md-12 d-grid">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Internship Listings Grid -->
+    <div class="row g-4">
+        {% if internships %}
+            {% for item in internships %}
+                {% set job = item.obj %}
+                {% set match = item.match %}
+                <div class="col-lg-6">
+                    <div class="app-card card-hoverable p-4 h-100 d-flex flex-column justify-content-between bg-white position-relative">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <span class="badge bg-light text-dark border me-1">{{ job.domain }}</span>
+                                    <span class="badge bg-primary-subtle text-primary fw-semibold">{{ job.work_mode }}</span>
+                                    {% if 'unpaid' in job.stipend|lower or 'unstipended' in job.stipend|lower %}
+                                        <span class="badge bg-secondary-subtle text-secondary fw-semibold">Unpaid / Experience</span>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if match %}
+                                    <div class="text-end">
+                                        <span class="ai-badge {% if match.rf_probability >= 70 %}ai-badge-high{% elif match.rf_probability >= 40 %}ai-badge-medium{% else %}ai-badge-low{% endif %}"
+                                              data-bs-toggle="tooltip" title="Match Percentage based on your dynamic resume skills">
+                                            <i class="bi bi-stars"></i> {{ match.rf_probability }}% Match
+                                        </span>
+                                        <div class="small text-muted mt-1" style="font-size: 0.72rem;">
+                                            Match Percentage
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <h5 class="fw-bold mb-1">
+                                <a href="{{ url_for('internship_detail', internship_id=job.id) }}" class="text-dark text-decoration-none">
+                                    {{ job.title }}
+                                </a>
+                            </h5>
+
+                            <p class="text-muted small mb-2">
+                                <a href="{{ url_for('company_detail', company_id=job.company_id) }}" class="text-secondary text-decoration-none fw-semibold">
+                                    <i class="bi bi-building me-1"></i> {{ job.company.company_name }}
+                                </a> • 
+                                <i class="bi bi-geo-alt me-1"></i> {{ job.location }} • 
+                                <i class="bi bi-clock me-1"></i> {{ job.duration_months }} Months
+                            </p>
+
+                            <p class="text-secondary small mb-3">
+                                {{ job.description[:140] }}...
+                            </p>
+
+                            <!-- Required Skills -->
+                            <div class="mb-3">
+                                <span class="d-block small text-muted mb-1 fw-semibold">Required Skills:</span>
+                                {% for s in job.required_skills.split(',') %}
+                                    {% set skill_clean = s.strip() %}
+                                    {% if match and skill_clean|lower in match.skill_overlap.matched|map('lower') %}
+                                        <span class="skill-tag skill-tag-matched"><i class="bi bi-check"></i> {{ skill_clean }}</span>
+                                    {% else %}
+                                        <span class="skill-tag">{{ skill_clean }}</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="text-muted small d-block">Stipend / Compensation</span>
+                                {% if 'unpaid' in job.stipend|lower or 'unstipended' in job.stipend|lower %}
+                                    <span class="fw-bold text-secondary">Unpaid / Unstipended</span>
+                                {% else %}
+                                    <span class="fw-bold text-success">{{ job.stipend }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('internship_detail', internship_id=job.id) }}" class="btn btn-outline-secondary btn-sm">
+                                    Details
+                                </a>
+                                {% if item.has_applied %}
+                                    <button class="btn btn-secondary btn-sm" disabled>
+                                        <i class="bi bi-check2-circle"></i> Applied
+                                    </button>
+                                {% elif current_user and current_user.role == 'student' %}
+                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#applyModal{{ job.id }}">
+                                        Apply Now
+                                    </button>
+                                {% else %}
+                                    <a href="{{ url_for('login') }}" class="btn btn-primary btn-sm">Apply</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Apply Modal -->
+                {% if current_user and current_user.role == 'student' and not item.has_applied %}
+                    <div class="modal fade" id="applyModal{{ job.id }}" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-0 shadow">
+                                <div class="modal-header">
+                                    <h5 class="modal-title fw-bold">Apply for {{ job.title }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form action="{{ url_for('apply_internship', internship_id=job.id) }}" method="POST">
+                                    <div class="modal-body">
+                                        <div class="alert alert-info py-2 small mb-3">
+                                            <i class="bi bi-info-circle-fill me-1"></i> Your <strong>Single Dynamic Resume</strong> will be automatically attached and evaluated for this position.
+                                        </div>
+
+                                        {% if match %}
+                                            <div class="card p-3 bg-light border-0 mb-3">
+                                                <div class="d-flex justify-content-between small fw-bold">
+                                                    <span>Profile Match Percentage:</span>
+                                                    <span class="text-success">{{ match.rf_probability }}%</span>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-semibold">Short Note / Cover Letter (Optional)</label>
+                                            <textarea name="cover_letter" class="form-control" rows="3" placeholder="Highlight why you are an ideal fit for this role..."></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-primary btn-sm">Confirm & Submit Application</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-emoji-neutral display-4 text-muted"></i>
+                <h5 class="fw-bold mt-3 text-dark">No internships found</h5>
+                <p class="text-muted small">Try modifying your search criteria, stipend type, or domain filter.</p>
+                <a href="{{ url_for('internships') }}" class="btn btn-outline-primary btn-sm">Clear Filters</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

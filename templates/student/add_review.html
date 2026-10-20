@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Write Verified Review - InternHub{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="app-card p-4 p-md-5 bg-white shadow-lg border-0">
+                <div class="mb-4">
+                    <span class="badge bg-success-subtle text-success fw-bold mb-2">
+                        <i class="bi bi-patch-check-fill"></i> Verified Completed Intern Feedback
+                    </span>
+                    <h3 class="fw-bold mb-1">Review Your Internship at {{ application.internship.company.company_name }}</h3>
+                    <p class="text-muted small">
+                        Role: <strong>{{ application.internship.title }}</strong> • Your candid feedback empowers fellow students.
+                    </p>
+                </div>
+
+                <form action="{{ url_for('add_review', application_id=application.id) }}" method="POST">
+                    <!-- Overall Rating -->
+                    <div class="mb-4 text-center bg-light p-3 rounded-3">
+                        <label class="form-label d-block fw-bold mb-2 text-dark">Overall Experience Rating *</label>
+                        <div class="star-picker star-rating-lg d-inline-flex gap-2" id="overallPicker">
+                            <input type="hidden" name="rating" value="5">
+                            <i class="bi bi-star-fill text-warning star-icon fs-2 cursor-pointer" data-value="1"></i>
+                            <i class="bi bi-star-fill text-warning star-icon fs-2 cursor-pointer" data-value="2"></i>
+                            <i class="bi bi-star-fill text-warning star-icon fs-2 cursor-pointer" data-value="3"></i>
+                            <i class="bi bi-star-fill text-warning star-icon fs-2 cursor-pointer" data-value="4"></i>
+                            <i class="bi bi-star-fill text-warning star-icon fs-2 cursor-pointer" data-value="5"></i>
+                        </div>
+                    </div>
+
+                    <!-- Granular Sub Ratings -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Work Environment</label>
+                            <select name="work_environment_rating" class="form-select">
+                                <option value="5">5 - Excellent & Collaborative</option>
+                                <option value="4" selected>4 - Very Good</option>
+                                <option value="3">3 - Average</option>
+                                <option value="2">2 - Needs Improvement</option>
+                                <option value="1">1 - Poor</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Learning Opportunities</label>
+                            <select name="learning_rating" class="form-select">
+                                <option value="5" selected>5 - Outstanding Growth</option>
+                                <option value="4">4 - Good Exposure</option>
+                                <option value="3">3 - Moderate</option>
+                                <option value="2">2 - Limited</option>
+                                <option value="1">1 - None</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Mentor Support</label>
+                            <select name="mentor_support_rating" class="form-select">
+                                <option value="5" selected>5 - Very Helpful & Available</option>
+                                <option value="4">4 - Good Guidance</option>
+                                <option value="3">3 - Occasional</option>
+                                <option value="2">2 - Rare</option>
+                                <option value="1">1 - Unsupportive</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Headline / Review Title *</label>
+                        <input type="text" name="title" class="form-control" required placeholder="e.g. Great learning curve and supportive engineering team!">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Detailed Feedback *</label>
+                        <textarea name="review_text" class="form-control" rows="4" required placeholder="Describe your daily tasks, learning, team collaboration, stipend timeliness, and overall journey..."></textarea>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold text-success"><i class="bi bi-plus-circle me-1"></i> Pros</label>
+                            <input type="text" name="pros" class="form-control" placeholder="e.g. Flexible hours, real production code...">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold text-danger"><i class="bi bi-dash-circle me-1"></i> Cons</label>
+                            <input type="text" name="cons" class="form-control" placeholder="e.g. Fast-paced sprints, heavy documentation...">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{{ url_for('student_applications') }}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold">Publish Verified Review</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+
+{% block title %}Database Viewer - internhub_db | InternHub{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 px-lg-5">
+    <!-- Top Status Banner -->
+    <div class="card border-0 shadow-sm mb-4 bg-white rounded-3">
+        <div class="card-body p-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-3 p-3 bg-success-subtle text-success d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
+                        <i class="bi bi-database-fill fs-3"></i>
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <h4 class="fw-bold mb-0">Database Viewer</h4>
+                            <span class="badge bg-success text-white px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i> Connected Live</span>
+                            <span class="badge bg-light text-dark border">MongoDB 8.2</span>
+                        </div>
+                        <p class="text-muted small mb-0 font-monospace">
+                            <i class="bi bi-hdd-network me-1"></i> URI: <strong>mongodb://localhost:27017/internhub_db</strong> • Total Records: <strong>{{ total_db_docs }}</strong>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="{{ url_for('export_collection', collection=current_collection) }}" class="btn btn-outline-secondary btn-sm fw-semibold">
+                        <i class="bi bi-download me-1"></i> Export Collection JSON
+                    </a>
+                    <a href="{{ url_for('db_viewer', collection=current_collection, mode='table' if view_mode == 'json' else 'json', q=search_q) }}" class="btn btn-outline-primary btn-sm fw-semibold">
+                        {% if view_mode == 'json' %}
+                            <i class="bi bi-table me-1"></i> Switch to Table View
+                        {% else %}
+                            <i class="bi bi-code-slash me-1"></i> Switch to Raw JSON View
+                        {% endif %}
+                    </a>
+                    {% if current_user and current_user.role == 'admin' %}
+                        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-dark btn-sm fw-semibold">
+                            <i class="bi bi-arrow-left me-1"></i> Admin Panel
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Two-Column Layout -->
+    <div class="row g-4">
+        <!-- Sidebar: Collections List -->
+        <div class="col-lg-3 col-md-4">
+            <div class="card border-0 shadow-sm bg-white rounded-3 mb-4">
+                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                    <span class="fw-bold text-uppercase small text-muted"><i class="bi bi-folder2-open me-1"></i> Collections ({{ collections|length }})</span>
+                    <span class="badge bg-secondary-subtle text-secondary small">{{ total_db_docs }} Docs</span>
+                </div>
+                <div class="list-group list-group-flush py-2">
+                    {% for col in collections %}
+                        <a href="{{ url_for('db_viewer', collection=col.name, mode=view_mode) }}"
+                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 px-3 border-0 rounded-2 mx-2 mb-1 {% if col.is_active %}bg-primary text-white fw-bold shadow-sm{% else %}text-dark{% endif %}">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi {% if col.name == 'students' %}bi-mortarboard{% elif col.name == 'companies' %}bi-building{% elif col.name == 'internships' %}bi-briefcase{% elif col.name == 'applications' %}bi-file-earmark-check{% elif col.name == 'reviews' %}bi-star{% elif col.name == 'users' %}bi-person-badge{% else %}bi-bell{% endif %}"></i>
+                                <span>{{ col.name }}</span>
+                            </div>
+                            <span class="badge {% if col.is_active %}bg-white text-primary{% else %}bg-light text-muted border{% endif %} rounded-pill px-2">
+                                {{ col.count }}
+                            </span>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Database Info Card -->
+            <div class="card border-0 shadow-sm bg-white rounded-3 p-3 text-muted small">
+                <h6 class="fw-bold text-dark mb-2"><i class="bi bi-info-circle me-1 text-primary"></i> Database Architecture</h6>
+                <p class="mb-2"><strong>Database:</strong> internhub_db</p>
+                <p class="mb-2"><strong>Type:</strong> NoSQL Document Store (BSON / JSON)</p>
+                <p class="mb-2"><strong>Driver:</strong> PyMongo 4.x</p>
+                <p class="mb-0"><strong>Relationships:</strong> Foreign keys linked via MongoDB <code>ObjectId</code> and <code>user_id</code> references.</p>
+            </div>
+        </div>
+
+        <!-- Main Content: Collection Data Explorer -->
+        <div class="col-lg-9 col-md-8">
+            <div class="card border-0 shadow-sm bg-white rounded-3 mb-4">
+                <!-- Collection Header & Search -->
+                <div class="card-header bg-white py-3 border-bottom">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <div>
+                            <h5 class="fw-bold mb-0 text-dark">
+                                <i class="bi bi-collection text-primary me-2"></i>Collection: <span class="text-primary font-monospace">{{ current_collection }}</span>
+                            </h5>
+                            <small class="text-muted">Showing {{ documents|length }} document(s) in this collection</small>
+                        </div>
+
+                        <!-- Search Form -->
+                        <form method="GET" action="{{ url_for('db_viewer') }}" class="d-flex gap-2">
+                            <input type="hidden" name="collection" value="{{ current_collection }}">
+                            <input type="hidden" name="mode" value="{{ view_mode }}">
+                            <div class="input-group input-group-sm" style="min-width: 260px;">
+                                <input type="text" name="q" class="form-control" placeholder="Search by ID or text..." value="{{ search_q }}">
+                                <button class="btn btn-outline-primary" type="submit">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                                {% if search_q %}
+                                    <a href="{{ url_for('db_viewer', collection=current_collection, mode=view_mode) }}" class="btn btn-outline-secondary" title="Clear filter">
+                                        <i class="bi bi-x"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- View Mode Body -->
+                {% if view_mode == 'json' %}
+                    <!-- Raw JSON Viewer -->
+                    <div class="card-body p-0">
+                        <div class="bg-dark text-light p-3 rounded-bottom font-monospace small" style="max-height: 650px; overflow-y: auto;">
+                            <pre class="mb-0" style="white-space: pre-wrap; font-size: 0.82rem; color: #a5d6a7;">{{ collection_json }}</pre>
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- Table View -->
+                    <div class="card-body p-0">
+                        {% if documents %}
+                            <div class="table-responsive" style="max-height: 650px; overflow-y: auto;">
+                                <table class="table table-hover table-striped align-middle mb-0 font-monospace small" style="font-size: 0.83rem;">
+                                    <thead class="table-dark sticky-top small text-uppercase">
+                                        <tr>
+                                            <th style="min-width: 90px;">Action</th>
+                                            {% for col_key in columns %}
+                                                <th style="min-width: 140px;">{{ col_key }}</th>
+                                            {% endfor %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for doc in documents %}
+                                            <tr>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary py-0 px-2 fw-semibold"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#docModal"
+                                                            onclick="inspectDoc('{{ doc.id }}')">
+                                                        <i class="bi bi-eye"></i> View
+                                                    </button>
+                                                </td>
+                                                {% for col_key in columns %}
+                                                    {% set val = doc.raw.get(col_key) %}
+                                                    <td>
+                                                        {% if col_key == '_id' %}
+                                                            <span class="badge bg-dark-subtle text-dark border">{{ doc.id }}</span>
+                                                        {% elif val is sameas true %}
+                                                            <span class="badge bg-success-subtle text-success">true</span>
+                                                        {% elif val is sameas false %}
+                                                            <span class="badge bg-danger-subtle text-danger">false</span>
+                                                        {% elif val is mapping %}
+                                                            <span class="badge bg-info-subtle text-info border">Object { {{ val.keys()|length }} keys }</span>
+                                                        {% elif val is iterable and val is not string %}
+                                                            <span class="badge bg-warning-subtle text-dark border">Array [{{ val|length }} items]</span>
+                                                        {% elif val is none %}
+                                                            <span class="text-muted fst-italic">null</span>
+                                                        {% else %}
+                                                            <span title="{{ val }}">{{ val|string|truncate(45) }}</span>
+                                                        {% endif %}
+                                                    </td>
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
+                                <p class="mb-0">No documents found in collection <strong>{{ current_collection }}</strong>.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                <!-- Footer Summary -->
+                <div class="card-footer bg-light py-2 px-3 d-flex justify-content-between align-items-center small text-muted">
+                    <span>Active Collection: <strong>{{ current_collection }}</strong></span>
+                    <span>Displaying {{ documents|length }} records</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: JSON Document Inspector -->
+<div class="modal fade" id="docModal" tabindex="-1" aria-labelledby="docModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title font-monospace small" id="docModalLabel">
+                    <i class="bi bi-file-earmark-code me-1 text-warning"></i> Document Inspector: <span id="modalDocId" class="text-info"></span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0 bg-dark">
+                <pre class="p-3 mb-0 text-white font-monospace" style="font-size: 0.85rem; color: #81d4fa !important; background-color: #1e1e1e;" id="modalDocJson"></pre>
+            </div>
+            <div class="modal-footer bg-light py-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="copyModalJson()">
+                    <i class="bi bi-clipboard me-1"></i> Copy JSON
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Map of documents JSON
+    const docsStore = {
+        {% for doc in documents %}
+            "{{ doc.id }}": {{ doc.json|tojson }},
+        {% endfor %}
+    };
+
+    function inspectDoc(docId) {
+        document.getElementById('modalDocId').innerText = docId;
+        const jsonContent = docsStore[docId] || "{}";
+        document.getElementById('modalDocJson').innerText = jsonContent;
+    }
+
+    function copyModalJson() {
+        const text = document.getElementById('modalDocJson').innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            alert("Document JSON copied to clipboard!");
+        });
+    }
+</script>
+{% endblock %}

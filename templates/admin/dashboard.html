@@ -1,0 +1,928 @@
+{% extends 'base.html' %}
+
+{% block title %}Executive Administration - Platform Governance | InternHub{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 px-lg-5">
+    <!-- Executive Admin Header -->
+    <div class="card border-0 shadow-sm mb-4 bg-white rounded-3">
+        <div class="card-body p-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-3 p-3 bg-dark text-white d-flex align-items-center justify-content-center shadow-sm" style="width: 56px; height: 56px;">
+                        <i class="bi bi-shield-lock-fill fs-3 text-warning"></i>
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                            <h3 class="fw-bold mb-0 text-dark">Platform Governance & Oversight</h3>
+                            <span class="badge bg-warning text-dark fw-bold px-2 py-1"><i class="bi bi-gear-fill me-1"></i> Executive Admin</span>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-hdd-network-fill me-1"></i> Live Database Connected</span>
+                        </div>
+                        <p class="text-muted small mb-0">
+                            Monitor registered employers, evaluate student profiles, oversee candidate application pipelines, and moderate platform data.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="{{ url_for('db_viewer') }}" class="btn btn-outline-dark btn-sm fw-semibold shadow-sm d-flex align-items-center gap-2">
+                        <i class="bi bi-database text-primary"></i>
+                        <span>Open Database Viewer</span>
+                    </a>
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-light btn-sm fw-semibold border shadow-sm" title="Refresh data">
+                        <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Executive KPI Metric Cards -->
+    <div class="row g-3 mb-4">
+        <!-- Companies Metric -->
+        <div class="col-xl col-md-4 col-sm-6">
+            <div class="card border-0 shadow-sm rounded-3 h-100 bg-white cursor-pointer hover-lift border-top border-4 border-info" onclick="switchAdminTab('companies')">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small fw-bold text-uppercase">Employers</span>
+                        <div class="bg-info-subtle text-info p-2 rounded-2">
+                            <i class="bi bi-building fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold text-dark mb-1">{{ total_companies }}</h3>
+                    <div class="small text-muted d-flex align-items-center gap-1">
+                        <span class="badge bg-info-subtle text-info">Partner Companies</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Students Metric -->
+        <div class="col-xl col-md-4 col-sm-6">
+            <div class="card border-0 shadow-sm rounded-3 h-100 bg-white cursor-pointer hover-lift border-top border-4 border-primary" onclick="switchAdminTab('students')">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small fw-bold text-uppercase">Students</span>
+                        <div class="bg-primary-subtle text-primary p-2 rounded-2">
+                            <i class="bi bi-mortarboard fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold text-dark mb-1">{{ total_students }}</h3>
+                    <div class="small text-muted d-flex align-items-center gap-1">
+                        <span class="badge bg-primary-subtle text-primary">Dynamic Resumes</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Applications Metric -->
+        <div class="col-xl col-md-4 col-sm-6">
+            <div class="card border-0 shadow-sm rounded-3 h-100 bg-white cursor-pointer hover-lift border-top border-4 border-dark" onclick="switchAdminTab('applications')">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small fw-bold text-uppercase">Applications</span>
+                        <div class="bg-dark text-white p-2 rounded-2">
+                            <i class="bi bi-card-checklist fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold text-dark mb-1">{{ total_applications }}</h3>
+                    <div class="small text-muted d-flex align-items-center gap-1">
+                        <span class="badge bg-dark-subtle text-dark">Candidate Pipeline</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Internships Metric -->
+        <div class="col-xl col-md-6 col-sm-6">
+            <div class="card border-0 shadow-sm rounded-3 h-100 bg-white cursor-pointer hover-lift border-top border-4 border-success" onclick="switchAdminTab('internships')">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small fw-bold text-uppercase">Internships</span>
+                        <div class="bg-success-subtle text-success p-2 rounded-2">
+                            <i class="bi bi-briefcase fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold text-dark mb-1">{{ total_internships }}</h3>
+                    <div class="small text-muted d-flex align-items-center gap-1">
+                        <span class="badge bg-success-subtle text-success">Active Postings</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews Metric -->
+        <div class="col-xl col-md-6 col-sm-6">
+            <div class="card border-0 shadow-sm rounded-3 h-100 bg-white cursor-pointer hover-lift border-top border-4 border-warning" onclick="switchAdminTab('reviews')">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small fw-bold text-uppercase">Reviews</span>
+                        <div class="bg-warning-subtle text-warning p-2 rounded-2">
+                            <i class="bi bi-star-fill fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold text-dark mb-1">{{ total_reviews }}</h3>
+                    <div class="small text-muted d-flex align-items-center gap-1">
+                        <span class="badge bg-warning-subtle text-dark">Verified Ratings</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-pills gap-2 bg-white p-2 rounded-3 shadow-sm border mb-4" id="adminTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active fw-bold py-2 px-3 d-flex align-items-center gap-2" id="companies-tab" data-bs-toggle="pill" data-bs-target="#tab-companies" type="button">
+                <i class="bi bi-building"></i>
+                <span>Registered Companies</span>
+                <span class="badge bg-info-subtle text-info rounded-pill ms-1">{{ companies|length }}</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link fw-bold py-2 px-3 d-flex align-items-center gap-2" id="students-tab" data-bs-toggle="pill" data-bs-target="#tab-students" type="button">
+                <i class="bi bi-mortarboard"></i>
+                <span>Registered Students</span>
+                <span class="badge bg-primary-subtle text-primary rounded-pill ms-1">{{ students|length }}</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link fw-bold py-2 px-3 d-flex align-items-center gap-2" id="applications-tab" data-bs-toggle="pill" data-bs-target="#tab-applications" type="button">
+                <i class="bi bi-card-checklist"></i>
+                <span>Student Applications</span>
+                <span class="badge bg-dark-subtle text-dark rounded-pill ms-1">{{ applications|length }}</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link fw-bold py-2 px-3 d-flex align-items-center gap-2" id="internships-tab" data-bs-toggle="pill" data-bs-target="#tab-internships" type="button">
+                <i class="bi bi-briefcase"></i>
+                <span>Total Internships</span>
+                <span class="badge bg-success-subtle text-success rounded-pill ms-1">{{ internships|length }}</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link fw-bold py-2 px-3 d-flex align-items-center gap-2" id="reviews-tab" data-bs-toggle="pill" data-bs-target="#tab-reviews" type="button">
+                <i class="bi bi-star-fill text-warning"></i>
+                <span>Verified Reviews</span>
+                <span class="badge bg-warning-subtle text-dark rounded-pill ms-1">{{ reviews|length }}</span>
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Contents -->
+    <div class="tab-content" id="adminTabsContent">
+
+        <!-- ==================== 1. REGISTERED COMPANIES TAB ==================== -->
+        <div class="tab-pane fade show active" id="tab-companies" role="tabpanel">
+            <div class="card border-0 shadow-sm bg-white rounded-3">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <div>
+                            <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                                <i class="bi bi-building text-info"></i> Company Directory & Verification
+                            </h5>
+                            <small class="text-muted">Manage employer profiles, verification credentials, and job posting privileges</small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="input-group input-group-sm" style="min-width: 250px;">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                                <input type="text" class="form-control border-start-0" placeholder="Filter companies by name, industry, city..." onkeyup="filterTable('companiesTable', this.value)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="companiesTable">
+                            <thead class="table-light small text-uppercase font-monospace">
+                                <tr>
+                                    <th style="min-width: 220px;">Company / Organization</th>
+                                    <th>Contact & Email</th>
+                                    <th>Location</th>
+                                    <th>Postings</th>
+                                    <th>Status</th>
+                                    <th class="text-end" style="min-width: 170px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for c in companies %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="rounded-circle bg-dark text-white fw-bold d-flex align-items-center justify-content-center shadow-sm" style="width: 38px; height: 38px; font-size: 0.95rem;">
+                                                    {{ c.company_name[:1] }}
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold text-dark">{{ c.company_name }}</div>
+                                                    <div class="small text-muted">
+                                                        <span class="badge bg-light text-dark border">{{ c.industry or 'General' }}</span>
+                                                        {% if c.website %}
+                                                            <a href="{{ c.website }}" target="_blank" class="text-decoration-none text-primary ms-1" title="Visit Website">
+                                                                <i class="bi bi-box-arrow-up-right small"></i>
+                                                            </a>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="small fw-semibold text-dark">{{ c.contact_person or 'Talent Lead' }}</div>
+                                            <div class="small text-muted font-monospace">{{ c.user.email if c.user else 'N/A' }}</div>
+                                            {% if c.phone %}<div class="small text-muted"><i class="bi bi-telephone me-1"></i>{{ c.phone }}</div>{% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="small text-dark"><i class="bi bi-geo-alt me-1 text-muted"></i>{{ c.location or 'India' }}</div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark border px-2 py-1">
+                                                <i class="bi bi-briefcase me-1"></i>{{ c.internships|length }} Postings
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if c.is_verified %}
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                                    <i class="bi bi-patch-check-fill me-1"></i> Verified
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1">
+                                                    <i class="bi bi-hourglass-split me-1"></i> Pending
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="d-inline-flex gap-1">
+                                                <!-- View Company Modal Trigger -->
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" title="View Company Profile"
+                                                        onclick="showCompanyModal('{{ c.id }}', '{{ c.company_name|escape }}', '{{ c.industry|escape }}', '{{ c.location|escape }}', '{{ c.contact_person|escape }}', '{{ c.user.email if c.user else '' }}', '{{ c.phone|escape }}', '{{ c.website|escape }}', '{{ c.description|escape|replace('\n', ' ') }}', {{ c.internships|length }})">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+
+                                                <!-- Toggle Verification -->
+                                                <form action="{{ url_for('toggle_company_verification', id=c.id) }}" method="POST" class="d-inline">
+                                                    <button type="submit" class="btn btn-outline-primary btn-sm" title="Toggle Verification">
+                                                        {% if c.is_verified %}Revoke{% else %}Verify{% endif %}
+                                                    </button>
+                                                </form>
+
+                                                <!-- Delete Company -->
+                                                <form action="{{ url_for('admin_delete_company', id=c.id) }}" method="POST" class="d-inline"
+                                                      onsubmit="return confirm('WARNING: Are you sure you want to permanently delete company \'{{ c.company_name }}\'?\n\nThis will also delete all of their internship postings and candidate applications.');">
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete Company">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr><td colspan="6" class="text-center py-5 text-muted">No registered companies found.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 2. REGISTERED STUDENTS TAB ==================== -->
+        <div class="tab-pane fade" id="tab-students" role="tabpanel">
+            <div class="card border-0 shadow-sm bg-white rounded-3">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <div>
+                            <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                                <i class="bi bi-mortarboard text-primary"></i> Registered Student Directory
+                            </h5>
+                            <small class="text-muted">Inspect dynamic candidate profiles, academic records, and career skills</small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="input-group input-group-sm" style="min-width: 250px;">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                                <input type="text" class="form-control border-start-0" placeholder="Filter students by name, college, skills..." onkeyup="filterTable('studentsTable', this.value)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="studentsTable">
+                            <thead class="table-light small text-uppercase font-monospace">
+                                <tr>
+                                    <th style="min-width: 220px;">Student Candidate</th>
+                                    <th>College & Department</th>
+                                    <th>Year</th>
+                                    <th>CGPA</th>
+                                    <th>Technical Skills</th>
+                                    <th>Applications</th>
+                                    <th class="text-end" style="min-width: 130px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for s in students %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center shadow-sm" style="width: 38px; height: 38px; font-size: 0.95rem;">
+                                                    {{ s.full_name[:1] }}
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold text-dark">{{ s.full_name }}</div>
+                                                    <div class="small text-muted font-monospace">{{ s.user.email if s.user else 'N/A' }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="small fw-semibold text-dark">{{ s.college_name or 'College not set' }}</div>
+                                            <div class="small text-muted">{{ s.department or 'General' }}</div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark border">{{ s.year_of_study or 'N/A' }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary-subtle text-primary fw-bold font-monospace px-2 py-1">
+                                                {{ s.cgpa }} / 10
+                                            </span>
+                                        </td>
+                                        <td style="max-width: 260px;">
+                                            {% if s.technical_skills %}
+                                                <div class="d-flex flex-wrap gap-1">
+                                                    {% for sk in s.technical_skills.split(',')[:3] %}
+                                                        <span class="skill-tag" style="font-size: 0.72rem; padding: 2px 6px;">{{ sk.strip() }}</span>
+                                                    {% endfor %}
+                                                    {% if s.technical_skills.split(',')|length > 3 %}
+                                                        <span class="badge bg-light text-muted border" style="font-size: 0.7rem;">+{{ s.technical_skills.split(',')|length - 3 }}</span>
+                                                    {% endif %}
+                                                </div>
+                                            {% else %}
+                                                <span class="small text-muted">No skills listed</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-dark-subtle text-dark border px-2 py-1">
+                                                <i class="bi bi-send me-1"></i>{{ s.applications_count }} Applied
+                                            </span>
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="d-inline-flex gap-1">
+                                                <!-- View Student Profile Modal Trigger -->
+                                                <button type="button" class="btn btn-outline-primary btn-sm" title="View Full Resume"
+                                                        onclick="showStudentModal('{{ s.id }}', '{{ s.full_name|escape }}', '{{ s.user.email if s.user else '' }}', '{{ s.phone|escape }}', '{{ s.college_name|escape }}', '{{ s.department|escape }}', '{{ s.year_of_study|escape }}', '{{ s.cgpa }}', '{{ s.technical_skills|escape }}', '{{ s.soft_skills|escape }}', '{{ s.bio|escape|replace('\n', ' ') }}', '{{ s.location|escape }}', '{{ s.github_url|escape }}', '{{ s.linkedin_url|escape }}')">
+                                                    <i class="bi bi-file-earmark-person"></i> View
+                                                </button>
+
+                                                <!-- Delete Student -->
+                                                <form action="{{ url_for('admin_delete_student', id=s.id) }}" method="POST" class="d-inline"
+                                                      onsubmit="return confirm('WARNING: Are you sure you want to permanently delete student \'{{ s.full_name }}\'?\n\nThis will remove their account, dynamic resume, and application history.');">
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete Student">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr><td colspan="7" class="text-center py-5 text-muted">No registered students found.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 3. STUDENT APPLICATIONS TAB ==================== -->
+        <div class="tab-pane fade" id="tab-applications" role="tabpanel">
+            <div class="card border-0 shadow-sm bg-white rounded-3">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <div>
+                            <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                                <i class="bi bi-card-checklist text-dark"></i> Candidate Applications Pipeline
+                            </h5>
+                            <small class="text-muted">Review candidate matchmaking scores, recruitment statuses, and submission dates</small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="input-group input-group-sm" style="min-width: 250px;">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                                <input type="text" class="form-control border-start-0" placeholder="Filter by candidate, internship, company..." onkeyup="filterTable('applicationsTable', this.value)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="applicationsTable">
+                            <thead class="table-light small text-uppercase font-monospace">
+                                <tr>
+                                    <th style="min-width: 200px;">Candidate</th>
+                                    <th style="min-width: 200px;">Position Applied</th>
+                                    <th>Hiring Company</th>
+                                    <th>Recruiting %</th>
+                                    <th>Match %</th>
+                                    <th>Status</th>
+                                    <th>Applied Date</th>
+                                    <th class="text-end" style="min-width: 120px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for app in applications %}
+                                    <tr>
+                                        <td>
+                                            <div class="fw-bold text-dark">{{ app.student.full_name if app.student else 'Unknown Candidate' }}</div>
+                                            <div class="small text-muted font-monospace">{{ app.student.user.email if (app.student and app.student.user) else '' }}</div>
+                                            <small class="badge bg-light text-muted border">CGPA: {{ app.student.cgpa if app.student else 'N/A' }}</small>
+                                        </td>
+                                        <td>
+                                            <div class="fw-semibold text-dark">{{ app.internship.title if app.internship else 'Position' }}</div>
+                                            <small class="badge bg-light text-dark border">{{ app.internship.domain if app.internship else 'General' }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="text-dark fw-semibold small">
+                                                <i class="bi bi-building me-1 text-muted"></i>{{ app.internship.company.company_name if (app.internship and app.internship.company) else 'N/A' }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="score-chip bg-primary-subtle text-primary fw-bold font-monospace">
+                                                {{ app.tfidf_score }}%
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="score-chip bg-success-subtle text-success fw-bold font-monospace">
+                                                {{ app.rf_probability }}%
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="status-badge status-{{ app.status }}">{{ app.status }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="small text-muted font-monospace">
+                                                {{ app.applied_at.strftime('%d %b %Y') if app.applied_at else 'N/A' }}
+                                            </span>
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="d-inline-flex gap-1">
+                                                <!-- View Application Modal Trigger -->
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" title="View Application Note"
+                                                        onclick="showAppModal('{{ app.id }}', '{{ app.student.full_name|escape if app.student else 'Candidate' }}', '{{ app.internship.title|escape if app.internship else 'Internship' }}', '{{ app.internship.company.company_name|escape if (app.internship and app.internship.company) else '' }}', '{{ app.tfidf_score }}', '{{ app.rf_probability }}', '{{ app.status }}', '{{ app.cover_letter|escape|replace('\n', ' ') if app.cover_letter else 'No cover note submitted.' }}', '{{ app.company_notes|escape|replace('\n', ' ') if app.company_notes else 'No feedback note recorded.' }}')">
+                                                    <i class="bi bi-card-text"></i>
+                                                </button>
+
+                                                <!-- Delete Application -->
+                                                <form action="{{ url_for('admin_delete_application', id=app.id) }}" method="POST" class="d-inline"
+                                                      onsubmit="return confirm('Are you sure you want to delete this application record?');">
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete Application">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr><td colspan="8" class="text-center py-5 text-muted">No applications processed yet.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 4. TOTAL INTERNSHIPS TAB ==================== -->
+        <div class="tab-pane fade" id="tab-internships" role="tabpanel">
+            <div class="card border-0 shadow-sm bg-white rounded-3">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <div>
+                            <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                                <i class="bi bi-briefcase text-success"></i> Platform Internship Postings
+                            </h5>
+                            <small class="text-muted">Supervise all active and closed job listings, compensation types, and applicants</small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="input-group input-group-sm" style="min-width: 250px;">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                                <input type="text" class="form-control border-start-0" placeholder="Filter internships by title, company, domain..." onkeyup="filterTable('internshipsTable', this.value)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="internshipsTable">
+                            <thead class="table-light small text-uppercase font-monospace">
+                                <tr>
+                                    <th style="min-width: 220px;">Internship Title</th>
+                                    <th>Company</th>
+                                    <th>Domain & Mode</th>
+                                    <th>Compensation</th>
+                                    <th>Applicants</th>
+                                    <th>Status</th>
+                                    <th class="text-end" style="min-width: 150px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for job in internships %}
+                                    <tr>
+                                        <td>
+                                            <h6 class="fw-bold mb-0">
+                                                <a href="{{ url_for('internship_detail', internship_id=job.id) }}" class="text-dark text-decoration-none">
+                                                    {{ job.title }}
+                                                </a>
+                                            </h6>
+                                            <small class="text-muted">{{ job.duration_months }} Months • {{ job.vacancies }} Vacancy(s)</small>
+                                        </td>
+                                        <td>
+                                            <span class="fw-semibold text-dark">{{ job.company.company_name if job.company else 'N/A' }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark border">{{ job.domain }}</span>
+                                            <span class="badge bg-primary-subtle text-primary">{{ job.work_mode }}</span>
+                                        </td>
+                                        <td>
+                                            {% if 'unpaid' in job.stipend|lower or 'unstipended' in job.stipend|lower %}
+                                                <span class="badge bg-secondary-subtle text-secondary">Unpaid / Trainee</span>
+                                            {% else %}
+                                                <strong class="text-success small">{{ job.stipend }}</strong>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-dark-subtle text-dark border px-2 py-1">
+                                                <i class="bi bi-people me-1"></i>{{ job.applications_count }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if job.is_active %}
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                                    <i class="bi bi-check-circle me-1"></i> Active
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-secondary-subtle text-secondary border px-2 py-1">
+                                                    Closed
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="d-inline-flex gap-1">
+                                                <!-- Toggle Internship Active / Closed -->
+                                                <form action="{{ url_for('admin_toggle_internship', id=job.id) }}" method="POST" class="d-inline">
+                                                    <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                                        {% if job.is_active %}Close{% else %}Activate{% endif %}
+                                                    </button>
+                                                </form>
+
+                                                <!-- Delete Internship -->
+                                                <form action="{{ url_for('admin_delete_internship', id=job.id) }}" method="POST" class="d-inline"
+                                                      onsubmit="return confirm('Are you sure you want to delete internship \'{{ job.title }}\'? This will also delete all associated student applications.');">
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete Internship">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr><td colspan="7" class="text-center py-5 text-muted">No internships posted yet.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 5. VERIFIED REVIEWS TAB ==================== -->
+        <div class="tab-pane fade" id="tab-reviews" role="tabpanel">
+            <div class="card border-0 shadow-sm bg-white rounded-3">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <div>
+                            <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                                <i class="bi bi-star-fill text-warning"></i> Verified Student Reviews & Ratings
+                            </h5>
+                            <small class="text-muted">Student feedback authenticated strictly for completed internships</small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="input-group input-group-sm" style="min-width: 250px;">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                                <input type="text" class="form-control border-start-0" placeholder="Filter reviews by company or student..." onkeyup="filterTable('reviewsTable', this.value)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="reviewsTable">
+                            <thead class="table-light small text-uppercase font-monospace">
+                                <tr>
+                                    <th>Employer</th>
+                                    <th>Reviewer</th>
+                                    <th>Overall Rating</th>
+                                    <th style="min-width: 260px;">Review Details</th>
+                                    <th>Category Scores</th>
+                                    <th class="text-end" style="min-width: 100px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for r in reviews %}
+                                    <tr>
+                                        <td>
+                                            <div class="fw-bold text-dark">{{ r.company.company_name if r.company else 'N/A' }}</div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-semibold text-dark">{{ r.student.full_name if r.student else 'Anonymous' }}</div>
+                                            <small class="badge bg-success-subtle text-success border border-success-subtle">
+                                                <i class="bi bi-patch-check-fill me-1"></i> Completed Intern
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <div class="star-rating">
+                                                {% for i in range(r.rating) %}
+                                                    <i class="bi bi-star-fill text-warning"></i>
+                                                {% endfor %}
+                                            </div>
+                                            <small class="text-muted d-block fw-bold">{{ r.rating }} / 5.0</small>
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold text-dark small">"{{ r.title }}"</div>
+                                            <small class="text-secondary">{{ r.review_text[:140] }}{% if r.review_text|length > 140 %}...{% endif %}</small>
+                                        </td>
+                                        <td class="small text-muted font-monospace">
+                                            <div>Culture: <strong class="text-dark">{{ r.work_environment_rating }}/5</strong></div>
+                                            <div>Learning: <strong class="text-dark">{{ r.learning_rating }}/5</strong></div>
+                                            <div>Mentor: <strong class="text-dark">{{ r.mentor_support_rating }}/5</strong></div>
+                                        </td>
+                                        <td class="text-end">
+                                            <form action="{{ url_for('admin_delete_review', id=r.id) }}" method="POST" class="d-inline"
+                                                  onsubmit="return confirm('Are you sure you want to delete this verified review?');">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete Review">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr><td colspan="6" class="text-center py-5 text-muted">No verified reviews submitted yet.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ==================== MODAL: STUDENT DETAILS & RESUME PREVIEW ==================== -->
+<div class="modal fade" id="studentModal" tabindex="-1" aria-labelledby="studentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-dark text-white">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-person-bounding-box text-warning fs-5"></i>
+                    <div>
+                        <h5 class="modal-title fw-bold mb-0" id="mStudentName">Student Profile</h5>
+                        <small class="text-white-50" id="mStudentEmail"></small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 bg-light">
+                <div class="card border-0 shadow-sm p-3 mb-3 bg-white">
+                    <h6 class="fw-bold text-uppercase text-primary small mb-2 border-bottom pb-1">Academic Background</h6>
+                    <div class="row g-2 small">
+                        <div class="col-sm-6"><strong>College:</strong> <span id="mStudentCollege"></span></div>
+                        <div class="col-sm-6"><strong>Department:</strong> <span id="mStudentDept"></span></div>
+                        <div class="col-sm-6"><strong>Year of Study:</strong> <span id="mStudentYear"></span></div>
+                        <div class="col-sm-6"><strong>Academic CGPA:</strong> <span id="mStudentCgpa" class="badge bg-primary-subtle text-primary"></span></div>
+                        <div class="col-sm-6"><strong>Location:</strong> <span id="mStudentLocation"></span></div>
+                        <div class="col-sm-6"><strong>Contact Phone:</strong> <span id="mStudentPhone"></span></div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm p-3 mb-3 bg-white">
+                    <h6 class="fw-bold text-uppercase text-primary small mb-2 border-bottom pb-1">Professional Bio</h6>
+                    <p class="small text-secondary mb-0" id="mStudentBio">No bio submitted.</p>
+                </div>
+
+                <div class="card border-0 shadow-sm p-3 mb-3 bg-white">
+                    <h6 class="fw-bold text-uppercase text-primary small mb-2 border-bottom pb-1">Skills</h6>
+                    <div class="mb-2">
+                        <small class="fw-bold text-muted d-block">Technical Skills:</small>
+                        <div id="mStudentTechSkills" class="d-flex flex-wrap gap-1 mt-1"></div>
+                    </div>
+                    <div>
+                        <small class="fw-bold text-muted d-block">Soft Skills:</small>
+                        <p class="small text-secondary mb-0" id="mStudentSoftSkills"></p>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm p-3 bg-white">
+                    <h6 class="fw-bold text-uppercase text-primary small mb-2 border-bottom pb-1">Portfolio & Profiles</h6>
+                    <div class="d-flex gap-3 small flex-wrap" id="mStudentLinks"></div>
+                </div>
+            </div>
+            <div class="modal-footer bg-white">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODAL: COMPANY DETAILS ==================== -->
+<div class="modal fade" id="companyModal" tabindex="-1" aria-labelledby="companyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-dark text-white">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-building text-info fs-5"></i>
+                    <div>
+                        <h5 class="modal-title fw-bold mb-0" id="mCompanyName">Company Profile</h5>
+                        <small class="text-white-50" id="mCompanyIndustry"></small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 bg-light">
+                <div class="card border-0 shadow-sm p-3 mb-3 bg-white">
+                    <h6 class="fw-bold text-uppercase text-info small mb-2 border-bottom pb-1">Contact & Headquarters</h6>
+                    <div class="row g-2 small">
+                        <div class="col-sm-6"><strong>Contact Person:</strong> <span id="mCompanyContact"></span></div>
+                        <div class="col-sm-6"><strong>Email:</strong> <span id="mCompanyEmail" class="font-monospace"></span></div>
+                        <div class="col-sm-6"><strong>Phone:</strong> <span id="mCompanyPhone"></span></div>
+                        <div class="col-sm-6"><strong>Location:</strong> <span id="mCompanyLoc"></span></div>
+                        <div class="col-sm-6"><strong>Active Postings:</strong> <span id="mCompanyJobs" class="badge bg-light text-dark border"></span></div>
+                        <div class="col-sm-6"><strong>Website:</strong> <span id="mCompanyWeb"></span></div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm p-3 bg-white">
+                    <h6 class="fw-bold text-uppercase text-info small mb-2 border-bottom pb-1">About Company</h6>
+                    <p class="small text-secondary mb-0" id="mCompanyDesc"></p>
+                </div>
+            </div>
+            <div class="modal-footer bg-white">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODAL: APPLICATION DETAILS ==================== -->
+<div class="modal fade" id="appModal" tabindex="-1" aria-labelledby="appModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-dark text-white">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-file-earmark-check text-success fs-5"></i>
+                    <div>
+                        <h5 class="modal-title fw-bold mb-0" id="mAppTitle">Application Details</h5>
+                        <small class="text-white-50" id="mAppCandidate"></small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 bg-light">
+                <div class="card border-0 shadow-sm p-3 mb-3 bg-white text-center">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <small class="text-muted d-block fw-bold text-uppercase">Recruiting %</small>
+                            <h4 class="fw-bold text-primary mb-0 font-monospace" id="mAppTfidf"></h4>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block fw-bold text-uppercase">Match %</small>
+                            <h4 class="fw-bold text-success mb-0 font-monospace" id="mAppRf"></h4>
+                        </div>
+                    </div>
+                    <div class="mt-2 border-top pt-2">
+                        <small class="text-muted">Status: </small>
+                        <span class="badge bg-dark" id="mAppStatus"></span>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm p-3 mb-3 bg-white">
+                    <h6 class="fw-bold text-uppercase text-dark small mb-2 border-bottom pb-1">Candidate Cover Note</h6>
+                    <p class="small text-secondary mb-0" id="mAppCover"></p>
+                </div>
+
+                <div class="card border-0 shadow-sm p-3 bg-white">
+                    <h6 class="fw-bold text-uppercase text-dark small mb-2 border-bottom pb-1">Recruiter Feedback Note</h6>
+                    <p class="small text-secondary mb-0" id="mAppNotes"></p>
+                </div>
+            </div>
+            <div class="modal-footer bg-white">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Switch Admin Tab Programmatically
+function switchAdminTab(tabKey) {
+    const triggerEl = document.querySelector('#' + tabKey + '-tab');
+    if (triggerEl) {
+        const tabInstance = bootstrap.Tab.getOrCreateInstance(triggerEl);
+        tabInstance.show();
+        triggerEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
+
+// Client-Side Real-Time Filter for Tables
+function filterTable(tableId, query) {
+    const table = document.getElementById(tableId);
+    if (!table) return;
+    const rows = table.querySelectorAll('tbody tr');
+    const term = query.toLowerCase().trim();
+    rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(term) ? '' : 'none';
+    });
+}
+
+// Student Modal Populator
+function showStudentModal(id, name, email, phone, college, dept, year, cgpa, techSkills, softSkills, bio, location, github, linkedin) {
+    document.getElementById('mStudentName').innerText = name || 'Student';
+    document.getElementById('mStudentEmail').innerText = email || '';
+    document.getElementById('mStudentCollege').innerText = college || 'Not specified';
+    document.getElementById('mStudentDept').innerText = dept || 'Not specified';
+    document.getElementById('mStudentYear').innerText = year || 'Not specified';
+    document.getElementById('mStudentCgpa').innerText = (cgpa || '0.0') + ' / 10';
+    document.getElementById('mStudentLocation').innerText = location || 'Not specified';
+    document.getElementById('mStudentPhone').innerText = phone || 'Not specified';
+    document.getElementById('mStudentBio').innerText = bio || 'No bio submitted.';
+    document.getElementById('mStudentSoftSkills').innerText = softSkills || 'None listed.';
+
+    // Populate tech skills
+    const skillsContainer = document.getElementById('mStudentTechSkills');
+    skillsContainer.innerHTML = '';
+    if (techSkills && techSkills.trim()) {
+        techSkills.split(',').forEach(sk => {
+            const span = document.createElement('span');
+            span.className = 'skill-tag';
+            span.innerText = sk.trim();
+            skillsContainer.appendChild(span);
+        });
+    } else {
+        skillsContainer.innerHTML = '<span class="text-muted small">None listed</span>';
+    }
+
+    // Populate links
+    const linksContainer = document.getElementById('mStudentLinks');
+    linksContainer.innerHTML = '';
+    if (github) {
+        linksContainer.innerHTML += `<a href="${github}" target="_blank" class="text-dark text-decoration-none fw-semibold"><i class="bi bi-github me-1"></i> GitHub</a>`;
+    }
+    if (linkedin) {
+        linksContainer.innerHTML += `<a href="${linkedin}" target="_blank" class="text-primary text-decoration-none fw-semibold"><i class="bi bi-linkedin me-1"></i> LinkedIn</a>`;
+    }
+    if (!github && !linkedin) {
+        linksContainer.innerHTML = '<span class="text-muted">No external profiles provided.</span>';
+    }
+
+    const modal = new bootstrap.Modal(document.getElementById('studentModal'));
+    modal.show();
+}
+
+// Company Modal Populator
+function showCompanyModal(id, name, industry, location, contact, email, phone, website, desc, jobsCount) {
+    document.getElementById('mCompanyName').innerText = name || 'Company';
+    document.getElementById('mCompanyIndustry').innerText = industry || '';
+    document.getElementById('mCompanyContact').innerText = contact || 'N/A';
+    document.getElementById('mCompanyEmail').innerText = email || 'N/A';
+    document.getElementById('mCompanyPhone').innerText = phone || 'N/A';
+    document.getElementById('mCompanyLoc').innerText = location || 'N/A';
+    document.getElementById('mCompanyJobs').innerText = jobsCount + ' Postings';
+    document.getElementById('mCompanyDesc').innerText = desc || 'No description provided.';
+
+    const webSpan = document.getElementById('mCompanyWeb');
+    if (website) {
+        webSpan.innerHTML = `<a href="${website}" target="_blank" class="text-primary text-decoration-none">${website}</a>`;
+    } else {
+        webSpan.innerText = 'Not specified';
+    }
+
+    const modal = new bootstrap.Modal(document.getElementById('companyModal'));
+    modal.show();
+}
+
+// Application Modal Populator
+function showAppModal(id, candidate, title, company, tfidf, rf, status, cover, notes) {
+    document.getElementById('mAppTitle').innerText = title + ' @ ' + company;
+    document.getElementById('mAppCandidate').innerText = 'Candidate: ' + candidate;
+    document.getElementById('mAppTfidf').innerText = tfidf + '%';
+    document.getElementById('mAppRf').innerText = rf + '%';
+    document.getElementById('mAppStatus').innerText = status;
+    document.getElementById('mAppCover').innerText = cover || 'No cover letter provided.';
+    document.getElementById('mAppNotes').innerText = notes || 'No recruiter notes recorded.';
+
+    const modal = new bootstrap.Modal(document.getElementById('appModal'));
+    modal.show();
+}
+</script>
+{% endblock %}

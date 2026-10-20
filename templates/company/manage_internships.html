@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Postings - InternHub{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold mb-1">Manage Internship Listings</h2>
+            <p class="text-muted mb-0">Track active job postings, applicants count, and toggle availability status.</p>
+        </div>
+        <a href="{{ url_for('post_internship') }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-circle me-1"></i> Post New Internship
+        </a>
+    </div>
+
+    <div class="app-card bg-white shadow-sm overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light small text-uppercase">
+                    <tr>
+                        <th>Title & Domain</th>
+                        <th>Stipend / Mode</th>
+                        <th>Duration</th>
+                        <th>Applicants</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if internships %}
+                        {% for job in internships %}
+                            <tr>
+                                <td>
+                                    <h6 class="fw-bold mb-0">
+                                        <a href="{{ url_for('internship_detail', internship_id=job.id) }}" class="text-dark text-decoration-none">
+                                            {{ job.title }}
+                                        </a>
+                                    </h6>
+                                    <span class="badge bg-light text-dark border small">{{ job.domain }}</span>
+                                </td>
+                                <td>
+                                    <div class="small fw-bold text-dark">{{ job.stipend }}</div>
+                                    <small class="text-muted">{{ job.work_mode }}</small>
+                                </td>
+                                <td class="small">{{ job.duration_months }} Months</td>
+                                <td>
+                                    <a href="{{ url_for('company_applicants', internship_id=job.id) }}" class="btn btn-outline-primary btn-sm py-0 px-2 fw-semibold">
+                                        {{ job.applications|length }} Candidates
+                                    </a>
+                                </td>
+                                <td>
+                                    {% if job.is_active %}
+                                        <span class="badge bg-success-subtle text-success">Active & Receiving Applications</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary-subtle text-secondary">Closed / Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <form action="{{ url_for('toggle_internship', id=job.id) }}" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-outline-secondary btn-sm" title="Toggle Active">
+                                            {% if job.is_active %}<i class="bi bi-pause-fill"></i> Close{% else %}<i class="bi bi-play-fill"></i> Activate{% endif %}
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                You haven't posted any internships yet. <a href="{{ url_for('post_internship') }}">Post your first role</a>.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
