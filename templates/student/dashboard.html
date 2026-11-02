@@ -41,14 +41,29 @@
         {% if recommendations %}
             {% for rec in recommendations %}
                 {% set job = rec.internship %}
+                {% set is_top = loop.first and rec.rf_probability > 0 %}
                 <div class="col-lg-4 col-md-6">
-                    <div class="app-card card-hoverable p-4 h-100 bg-white d-flex flex-column justify-content-between position-relative">
+                    <div class="app-card card-hoverable p-4 h-100 bg-white d-flex flex-column justify-content-between position-relative {% if is_top %}border border-2 border-success shadow-sm{% endif %}">
                         <div>
+                            {% if is_top %}
+                                <div class="mb-2">
+                                    <span class="badge bg-success text-white py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill fw-semibold shadow-sm" style="font-size: 0.76rem;">
+                                        <i class="bi bi-patch-check-fill"></i> High Match - Perfect for your internship expectation
+                                    </span>
+                                </div>
+                            {% endif %}
+
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <span class="badge bg-light text-dark border">{{ job.domain }}</span>
-                                <span class="ai-badge {% if rec.rf_probability >= 70 %}ai-badge-high{% elif rec.rf_probability >= 40 %}ai-badge-medium{% else %}ai-badge-low{% endif %}">
-                                    <i class="bi bi-stars"></i> {{ rec.rf_probability }}% Match
-                                </span>
+                                {% if is_top %}
+                                    <span class="badge bg-success text-white px-2 py-1 fw-bold shadow-sm">
+                                        <i class="bi bi-stars"></i> {{ rec.rf_probability }}% Match
+                                    </span>
+                                {% else %}
+                                    <span class="ai-badge {% if rec.rf_probability >= 70 %}ai-badge-high{% elif rec.rf_probability >= 40 %}ai-badge-medium{% else %}ai-badge-low{% endif %}">
+                                        <i class="bi bi-stars"></i> {{ rec.rf_probability }}% Match
+                                    </span>
+                                {% endif %}
                             </div>
 
                             <h5 class="fw-bold mb-1">

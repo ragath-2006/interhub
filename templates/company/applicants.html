@@ -16,7 +16,7 @@
     <!-- Filter & Sort Bar -->
     <div class="app-card p-3 mb-4 bg-white shadow-sm">
         <form action="{{ url_for('company_applicants') }}" method="GET" class="row g-3 align-items-center">
-            <div class="col-lg-4 col-md-6">
+            <div class="col-lg-3 col-md-6">
                 <select name="internship_id" class="form-select" onchange="this.form.submit()">
                     <option value="">All Internship Roles</option>
                     {% for job in internships %}
@@ -27,7 +27,7 @@
                 </select>
             </div>
 
-            <div class="col-lg-3 col-md-6">
+            <div class="col-lg-2 col-md-6">
                 <select name="status" class="form-select" onchange="this.form.submit()">
                     <option value="">All Statuses</option>
                     <option value="Applied" {% if selected_status == 'Applied' %}selected{% endif %}>Applied</option>
@@ -40,11 +40,20 @@
             </div>
 
             <div class="col-lg-3 col-md-6">
+                <select name="category" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Shortlisting Categories</option>
+                    <option value="high" {% if selected_category == 'high' %}selected{% endif %}>🟢 High possibility of selection (70-100%)</option>
+                    <option value="medium" {% if selected_category == 'medium' %}selected{% endif %}>🟡 Medium possibility of selection (50-70%)</option>
+                    <option value="least" {% if selected_category == 'least' %}selected{% endif %}>🔴 Least possibility of selection (&lt; 50%)</option>
+                </select>
+            </div>
+
+            <div class="col-lg-2 col-md-6">
                 <select name="sort" class="form-select" onchange="this.form.submit()">
-                    <option value="tfidf" {% if selected_sort == 'tfidf' %}selected{% endif %}>Sort by: Recruiting Percentage (Highest)</option>
-                    <option value="rf" {% if selected_sort == 'rf' %}selected{% endif %}>Sort by: Match Percentage (Highest)</option>
-                    <option value="cgpa" {% if selected_sort == 'cgpa' %}selected{% endif %}>Sort by: Student CGPA</option>
-                    <option value="date" {% if selected_sort == 'date' %}selected{% endif %}>Sort by: Applied Date (Newest)</option>
+                    <option value="tfidf" {% if selected_sort == 'tfidf' %}selected{% endif %}>Sort: Recruiting %</option>
+                    <option value="rf" {% if selected_sort == 'rf' %}selected{% endif %}>Sort: Match %</option>
+                    <option value="cgpa" {% if selected_sort == 'cgpa' %}selected{% endif %}>Sort: CGPA</option>
+                    <option value="date" {% if selected_sort == 'date' %}selected{% endif %}>Sort: Date</option>
                 </select>
             </div>
 
@@ -62,7 +71,7 @@
                     <tr>
                         <th>Candidate Profile</th>
                         <th>Applied Position</th>
-                        <th>Recruiting Percentage</th>
+                        <th>Recruiting & Shortlisting Category</th>
                         <th>Status</th>
                         <th class="text-end">Recruiter Actions</th>
                     </tr>
@@ -81,15 +90,28 @@
                                     <small class="text-muted">Applied {{ app.applied_at.strftime('%d %b %Y') }}</small>
                                 </td>
                                 <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="ai-badge {% if app.tfidf_score >= 70 %}ai-badge-high{% elif app.tfidf_score >= 40 %}ai-badge-medium{% else %}ai-badge-low{% endif %}">
-                                            <i class="bi bi-file-earmark-code"></i> {{ app.tfidf_score }}%
+                                    {% set c_score = app.rf_probability if (app.rf_probability is defined and app.rf_probability is not none) else app.tfidf_score %}
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <span class="fw-bold fs-6 {% if c_score >= 70 %}text-success{% elif c_score >= 50 %}text-warning-emphasis{% else %}text-danger{% endif %}">
+                                            {{ c_score }}%
                                         </span>
-                                        <div class="progress flex-grow-1" style="height: 6px; width: 60px;">
-                                            <div class="progress-bar bg-primary" style="width: {{ app.tfidf_score }}%;"></div>
+                                        <div class="progress flex-grow-1" style="height: 6px; max-width: 70px;">
+                                            <div class="progress-bar {% if c_score >= 70 %}bg-success{% elif c_score >= 50 %}bg-warning{% else %}bg-danger{% endif %}" style="width: {{ c_score }}%;"></div>
                                         </div>
                                     </div>
-                                    <div class="small text-muted mt-1" style="font-size: 0.72rem;">Recruiting Percentage</div>
+                                    {% if c_score >= 70 %}
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small fw-semibold">
+                                            <i class="bi bi-check-circle-fill me-1"></i> High possibility of selection
+                                        </span>
+                                    {% elif c_score >= 50 %}
+                                        <span class="badge bg-warning-subtle text-dark border border-warning-subtle px-2 py-1 small fw-semibold">
+                                            <i class="bi bi-dash-circle-fill text-warning me-1"></i> Medium possibility of selection
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 small fw-semibold">
+                                            <i class="bi bi-exclamation-circle-fill me-1"></i> Least possibility of selection
+                                        </span>
+                                    {% endif %}
                                 </td>
                                 <td>
                                     <span class="status-badge status-{{ app.status }}">{{ app.status }}</span>

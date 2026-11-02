@@ -32,6 +32,24 @@
                     <i class="bi bi-person-check text-primary"></i> Candidate Evaluation
                 </h5>
 
+                {% set c_score = match_details.rf_probability if (match_details.rf_probability is defined and match_details.rf_probability is not none) else match_details.tfidf_score %}
+                <div class="mb-3 p-3 rounded-2 border {% if c_score >= 70 %}bg-success-subtle border-success-subtle{% elif c_score >= 50 %}bg-warning-subtle border-warning-subtle{% else %}bg-danger-subtle border-danger-subtle{% endif %}">
+                    <div class="small fw-semibold text-muted mb-1">Shortlisting Category:</div>
+                    {% if c_score >= 70 %}
+                        <div class="fw-bold text-success d-flex align-items-center gap-1">
+                            <i class="bi bi-check-circle-fill fs-5"></i> High possibility of selection ({{ c_score }}%)
+                        </div>
+                    {% elif c_score >= 50 %}
+                        <div class="fw-bold text-dark d-flex align-items-center gap-1">
+                            <i class="bi bi-dash-circle-fill text-warning fs-5"></i> Medium possibility of selection ({{ c_score }}%)
+                        </div>
+                    {% else %}
+                        <div class="fw-bold text-danger d-flex align-items-center gap-1">
+                            <i class="bi bi-exclamation-circle-fill fs-5"></i> Least possibility of selection ({{ c_score }}%)
+                        </div>
+                    {% endif %}
+                </div>
+
                 <div class="mb-3">
                     <div class="d-flex justify-content-between small fw-bold mb-1">
                         <span>Recruiting Percentage:</span>

@@ -1,6 +1,7 @@
 import os
 import uuid
 import json
+import re
 from datetime import datetime
 from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, flash, session, Response
@@ -120,26 +121,37 @@ def internships():
 
     query = {'is_active': True}
     if domain:
-        query['domain'] = domain
+        query['domain'] = re.compile(f"^{re.escape(domain)}$", re.IGNORECASE)
     if work_mode:
-        query['work_mode'] = work_mode
+        query['work_mode'] = re.compile(f"^{re.escape(work_mode)}$", re.IGNORECASE)
     if location:
-        query['location'] = {'$regex': location, '$options': 'i'}
-    if stipend_type == 'unpaid':
-        query['stipend'] = {'$regex': 'unpaid|unstipended|free|0', '$options': 'i'}
-    elif stipend_type == 'paid':
-        query['stipend'] = {'$not': {'$regex': 'unpaid|unstipended', '$options': 'i'}}
+        query['location'] = re.compile(re.escape(location), re.IGNORECASE)
 
     if search:
-        query['$or'] = [
-            {'title': {'$regex': search, '$options': 'i'}},
-            {'required_skills': {'$regex': search, '$options': 'i'}},
-            {'description': {'$regex': search, '$options': 'i'}}
+        search_regex = re.compile(re.escape(search), re.IGNORECASE)
+        # Search matching company IDs as well so searching "google" finds Google internships
+        matching_company_ids = [str(c['_id']) for c in companies_col.find({'company_name': search_regex})]
+        or_clauses = [
+            {'title': search_regex},
+            {'required_skills': search_regex},
+            {'description': search_regex},
+            {'domain': search_regex},
+            {'location': search_regex}
         ]
+        if matching_company_ids:
+            or_clauses.append({'company_id': {'$in': matching_company_ids}})
+        query['$or'] = or_clauses
 
+    raw_items = list(internships_col.find(query).sort('created_at', -1))
     internship_list = []
-    for item in internships_col.find(query).sort('created_at', -1):
+    for item in raw_items:
         item = MongoHelper.format_doc(item)
+        stipend_val = str(item.get('stipend', '')).lower()
+        is_unpaid = bool(re.search(r'unpaid|unstipended|free|0', stipend_val))
+        if stipend_type == 'unpaid' and not is_unpaid:
+            continue
+        elif stipend_type == 'paid' and is_unpaid:
+            continue
         item['company'] = MongoHelper.get_company_by_id(item['company_id'])
         internship_list.append(item)
 
@@ -149,6 +161,8 @@ def internships():
     student_profile = user.get('student_profile') if (user and user.get('role') == 'student') else None
 
     scored_internships = []
+    top_match_id = None
+    max_score = -1.0
     for item in internship_list:
         match_info = None
         has_applied = False
@@ -158,12 +172,25 @@ def internships():
                 'internship_id': str(item['id']),
                 'student_id': str(student_profile['id'])
             }) is not None
+            if match_info:
+                s_prob = match_info.get('rf_probability', 0.0)
+                if s_prob > max_score:
+                    max_score = s_prob
+                    top_match_id = str(item['id'])
 
         scored_internships.append({
             'obj': item,
             'match': match_info,
-            'has_applied': has_applied
+            'has_applied': has_applied,
+            'is_top_match': False
         })
+
+    # Flag only the single highest matching internship among others
+    if student_profile and top_match_id and max_score > 0:
+        for s_item in scored_internships:
+            if str(s_item['obj']['id']) == top_match_id:
+                s_item['is_top_match'] = True
+                break
 
     return render_template('internships.html',
                            internships=scored_internships,
@@ -864,6 +891,7 @@ def company_applicants():
 
     internship_id = request.args.get('internship_id', '').strip()
     status_filter = request.args.get('status', '').strip()
+    category_filter = request.args.get('category', '').strip()
     sort_by = request.args.get('sort', 'tfidf').strip()
 
     company_internships = []
@@ -875,7 +903,7 @@ def company_applicants():
     internship_ids = [str(i['id']) for i in company_internships]
 
     if not internship_ids:
-        return render_template('company/applicants.html', applicants=[], internships=[])
+        return render_template('company/applicants.html', applicants=[], internships=[], selected_category='')
 
     query = {'internship_id': {'$in': internship_ids}}
     if internship_id:
@@ -892,6 +920,14 @@ def company_applicants():
         app['internship'] = MongoHelper.get_internship_by_id(app['internship_id'])
         applicants.append(app)
 
+    # Filter by Shortlisting Category if requested
+    if category_filter == 'high':
+        applicants = [a for a in applicants if (a.get('rf_probability') if a.get('rf_probability') is not None else a.get('tfidf_score', 0)) >= 70]
+    elif category_filter == 'medium':
+        applicants = [a for a in applicants if 50 <= (a.get('rf_probability') if a.get('rf_probability') is not None else a.get('tfidf_score', 0)) < 70]
+    elif category_filter == 'least':
+        applicants = [a for a in applicants if (a.get('rf_probability') if a.get('rf_probability') is not None else a.get('tfidf_score', 0)) < 50]
+
     # Sort applicants
     if sort_by == 'tfidf':
         applicants.sort(key=lambda a: a.get('tfidf_score', 0.0), reverse=True)
@@ -907,6 +943,7 @@ def company_applicants():
                            internships=company_internships,
                            selected_internship=internship_id,
                            selected_status=status_filter,
+                           selected_category=category_filter,
                            selected_sort=sort_by)
 
 @app.route('/company/applicant/<app_id>/status', methods=['POST'])
@@ -1201,7 +1238,8 @@ def db_viewer():
             sample = col_ref.find_one() or {}
             string_fields = [k for k, v in sample.items() if isinstance(v, str)]
             if string_fields:
-                query = {'$or': [{f: {'$regex': search_q, '$options': 'i'}} for f in string_fields[:5]]}
+                sq_regex = re.compile(re.escape(search_q), re.IGNORECASE)
+                query = {'$or': [{f: sq_regex} for f in string_fields[:5]]}
 
     raw_docs = list(col_ref.find(query).limit(100))
 

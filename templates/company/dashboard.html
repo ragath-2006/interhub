@@ -92,7 +92,7 @@
                         <th>Candidate Name</th>
                         <th>Position Applied</th>
                         <th>College / CGPA</th>
-                        <th>Recruiting Percentage</th>
+                        <th>Recruiting & Shortlisting Category</th>
                         <th>Status</th>
                         <th class="text-end">Actions</th>
                     </tr>
@@ -111,9 +111,28 @@
                                     <span class="badge bg-light text-dark border">CGPA: {{ app.student.cgpa }}</span>
                                 </td>
                                 <td>
-                                    <span class="ai-badge {% if app.tfidf_score >= 70 %}ai-badge-high{% elif app.tfidf_score >= 40 %}ai-badge-medium{% else %}ai-badge-low{% endif %}">
-                                        <i class="bi bi-award-fill"></i> {{ app.tfidf_score }}% Recruiting Match
-                                    </span>
+                                    {% set c_score = app.rf_probability if (app.rf_probability is defined and app.rf_probability is not none) else app.tfidf_score %}
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <span class="fw-bold fs-6 {% if c_score >= 70 %}text-success{% elif c_score >= 50 %}text-warning-emphasis{% else %}text-danger{% endif %}">
+                                            {{ c_score }}%
+                                        </span>
+                                        <div class="progress flex-grow-1" style="height: 6px; max-width: 60px;">
+                                            <div class="progress-bar {% if c_score >= 70 %}bg-success{% elif c_score >= 50 %}bg-warning{% else %}bg-danger{% endif %}" style="width: {{ c_score }}%;"></div>
+                                        </div>
+                                    </div>
+                                    {% if c_score >= 70 %}
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small fw-semibold">
+                                            <i class="bi bi-check-circle-fill me-1"></i> High possibility of selection
+                                        </span>
+                                    {% elif c_score >= 50 %}
+                                        <span class="badge bg-warning-subtle text-dark border border-warning-subtle px-2 py-1 small fw-semibold">
+                                            <i class="bi bi-dash-circle-fill text-warning me-1"></i> Medium possibility of selection
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 small fw-semibold">
+                                            <i class="bi bi-exclamation-circle-fill me-1"></i> Least possibility of selection
+                                        </span>
+                                    {% endif %}
                                 </td>
                                 <td>
                                     <span class="status-badge status-{{ app.status }}">{{ app.status }}</span>

@@ -72,8 +72,16 @@
                 {% set job = item.obj %}
                 {% set match = item.match %}
                 <div class="col-lg-6">
-                    <div class="app-card card-hoverable p-4 h-100 d-flex flex-column justify-content-between bg-white position-relative">
+                    <div class="app-card card-hoverable p-4 h-100 d-flex flex-column justify-content-between bg-white position-relative {% if item.is_top_match %}border border-2 border-success shadow-sm{% endif %}">
                         <div>
+                            {% if item.is_top_match %}
+                                <div class="mb-2">
+                                    <span class="badge bg-success text-white py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill fw-semibold shadow-sm" style="font-size: 0.76rem;">
+                                        <i class="bi bi-patch-check-fill"></i> High Match - Perfect for your internship expectation
+                                    </span>
+                                </div>
+                            {% endif %}
+
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <div>
                                     <span class="badge bg-light text-dark border me-1">{{ job.domain }}</span>
@@ -85,10 +93,17 @@
                                 
                                 {% if match %}
                                     <div class="text-end">
-                                        <span class="ai-badge {% if match.rf_probability >= 70 %}ai-badge-high{% elif match.rf_probability >= 40 %}ai-badge-medium{% else %}ai-badge-low{% endif %}"
-                                              data-bs-toggle="tooltip" title="Match Percentage based on your dynamic resume skills">
-                                            <i class="bi bi-stars"></i> {{ match.rf_probability }}% Match
-                                        </span>
+                                        {% if item.is_top_match %}
+                                            <span class="badge bg-success text-white px-2 py-1 fw-bold shadow-sm"
+                                                  data-bs-toggle="tooltip" title="High Match - Perfect for your internship expectation">
+                                                <i class="bi bi-stars"></i> {{ match.rf_probability }}% Match
+                                            </span>
+                                        {% else %}
+                                            <span class="ai-badge {% if match.rf_probability >= 70 %}ai-badge-high{% elif match.rf_probability >= 40 %}ai-badge-medium{% else %}ai-badge-low{% endif %}"
+                                                  data-bs-toggle="tooltip" title="Match Percentage based on your dynamic resume skills">
+                                                <i class="bi bi-stars"></i> {{ match.rf_probability }}% Match
+                                            </span>
+                                        {% endif %}
                                         <div class="small text-muted mt-1" style="font-size: 0.72rem;">
                                             Match Percentage
                                         </div>
