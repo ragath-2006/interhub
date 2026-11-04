@@ -194,7 +194,7 @@ def seed_database():
     db.session.flush()
 
     # 4. STUDENT USERS & DYNAMIC RESUMES
-    # Student 1: Rahul Sharma (Primary Demo Student)
+    # Student 1: Aarav Patel (Primary Demo Student)
     s1_user = User(email='student@internhub.com', role='student')
     s1_user.set_password('student123')
     db.session.add(s1_user)
@@ -202,7 +202,7 @@ def seed_database():
 
     s1_profile = StudentProfile(
         user_id=s1_user.id,
-        full_name="Rahul Sharma",
+        full_name="Aarav Patel",
         phone="+91 9123456780",
         college_name="National Institute of Technology (NIT)",
         department="Computer Science & Engineering",
@@ -213,9 +213,9 @@ def seed_database():
         career_interests="Full Stack Engineering, Machine Learning, Cloud Architecture",
         technical_skills="Python, Flask, React, JavaScript, SQL, Scikit-Learn, Machine Learning, TF-IDF, Git, REST APIs, HTML/CSS, Docker",
         soft_skills="Problem Solving, Team Leadership, Technical Writing, Agile Collaboration",
-        github_url="https://github.com/rahulsharma-demo",
-        linkedin_url="https://linkedin.com/in/rahulsharma-demo",
-        portfolio_url="https://rahulsharma.dev",
+        github_url="https://github.com/aaravpatel-demo",
+        linkedin_url="https://linkedin.com/in/aaravpatel-demo",
+        portfolio_url="https://aaravpatel.dev",
         avatar="default-avatar.png"
     )
     db.session.add(s1_profile)
@@ -258,14 +258,14 @@ def seed_database():
         student_id=s1_profile.id,
         title="AI Career & Internship Recommendation Engine",
         technologies="Python, Flask, Scikit-Learn, TF-IDF, Cosine Similarity, React",
-        project_url="https://github.com/rahulsharma-demo/internhub-ai",
+        project_url="https://github.com/aaravpatel-demo/internhub-ai",
         description="Designed and deployed an intelligent matching algorithm comparing student resume vector embeddings with job specs using TF-IDF and Random Forest shortlist scoring."
     ))
     db.session.add(Project(
         student_id=s1_profile.id,
         title="E-Commerce Microservices Platform",
         technologies="Python, Docker, Redis, PostgreSQL, React.js",
-        project_url="https://github.com/rahulsharma-demo/ecommerce-microservices",
+        project_url="https://github.com/aaravpatel-demo/ecommerce-microservices",
         description="Architected containerized microservices handling authentication, product catalog, payment webhooks, and asynchronous order processing."
     ))
 
@@ -470,7 +470,7 @@ def seed_database():
     notif_c1 = Notification(
         user_id=c1_user.id,
         title="New High-Match Applicant 🎯",
-        message="Rahul Sharma (NIT, CGPA 8.85) applied for AI & Machine Learning Research Intern with 88% TF-IDF match score.",
+        message="Aarav Patel (NIT, CGPA 8.85) applied for AI & Machine Learning Research Intern with 88% Match score.",
         category="info",
         link="/company/applicants",
         is_read=False
