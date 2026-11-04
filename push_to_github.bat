@@ -9,7 +9,7 @@ echo Target Repository: https://github.com/ragath-2006/interhub.git
 echo.
 echo Staging and committing changes...
 git add .
-git commit -m "Seed 10 premier tech companies, 10 internships, 10 students with zero Sharma, and 1 admin"
+git commit -m "Remove offline compatible text from footer and update copyright"
 echo.
 echo Pushing files to GitHub now, please wait...
 echo ---------------------------------------------------------------------
