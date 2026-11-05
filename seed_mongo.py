@@ -7,11 +7,11 @@ from db_mongo import (
 )
 from ml_engine import shortlist_predictor
 
-# 10 Diverse Indian tech students with ZERO occurrence of 'Sharma'
+# 10 Diverse Indian tech students with single names (NO surnames in name or email)
 STUDENTS_DATA = [
     {
-        'email': 'student@internhub.com',
-        'full_name': 'Aarav Patel',
+        'email': 'aarav@internhub.com',
+        'full_name': 'Aarav',
         'phone': '+91 9123456780',
         'college_name': 'National Institute of Technology (NIT)',
         'department': 'Computer Science & Engineering',
@@ -22,9 +22,9 @@ STUDENTS_DATA = [
         'career_interests': 'Full Stack Engineering, Machine Learning, Cloud Architecture',
         'technical_skills': 'Python, Flask, React, JavaScript, SQL, Machine Learning, Git, REST APIs, HTML/CSS, Docker',
         'soft_skills': 'Problem Solving, Team Leadership, Technical Writing, Agile Collaboration',
-        'github_url': 'https://github.com/aaravpatel-demo',
-        'linkedin_url': 'https://linkedin.com/in/aaravpatel-demo',
-        'portfolio_url': 'https://aaravpatel.dev',
+        'github_url': 'https://github.com/aarav-demo',
+        'linkedin_url': 'https://linkedin.com/in/aarav-demo',
+        'portfolio_url': 'https://aarav.dev',
         'educations': [
             {
                 'id': '1',
@@ -53,14 +53,14 @@ STUDENTS_DATA = [
                 'id': '1',
                 'title': 'AI Career & Internship Recommendation Engine',
                 'technologies': 'Python, Flask, Machine Learning, Data Analytics, React',
-                'project_url': 'https://github.com/aaravpatel-demo/internhub-ai',
+                'project_url': 'https://github.com/aarav-demo/internhub-ai',
                 'description': 'Designed and deployed an intelligent matching algorithm comparing student resume vector embeddings with job specs using candidate matchmaking and ranking algorithms.'
             },
             {
                 'id': '2',
                 'title': 'E-Commerce Microservices Platform',
                 'technologies': 'Python, Docker, Redis, MongoDB, React.js',
-                'project_url': 'https://github.com/aaravpatel-demo/ecommerce-microservices',
+                'project_url': 'https://github.com/aarav-demo/ecommerce-microservices',
                 'description': 'Architected containerized microservices handling authentication, product catalog, payment webhooks, and asynchronous order processing.'
             }
         ],
@@ -82,8 +82,8 @@ STUDENTS_DATA = [
         ]
     },
     {
-        'email': 'priya.nair@internhub.com',
-        'full_name': 'Priya Nair',
+        'email': 'priya@internhub.com',
+        'full_name': 'Priya',
         'phone': '+91 9845123456',
         'college_name': 'Birla Institute of Technology and Science (BITS Pilani)',
         'department': 'Data Science & Artificial Intelligence',
@@ -94,9 +94,9 @@ STUDENTS_DATA = [
         'career_interests': 'AI Research, Deep Learning, Natural Language Processing',
         'technical_skills': 'Python, PyTorch, TensorFlow, Deep Learning, NLP, Scikit-Learn, Pandas, NumPy, Computer Vision, Docker, Data Structures',
         'soft_skills': 'Research Methodologies, Analytical Thinking, Scientific Paper Writing',
-        'github_url': 'https://github.com/priyanair-ai',
-        'linkedin_url': 'https://linkedin.com/in/priyanair-ai',
-        'portfolio_url': 'https://priyanair.tech',
+        'github_url': 'https://github.com/priya-ai',
+        'linkedin_url': 'https://linkedin.com/in/priya-ai',
+        'portfolio_url': 'https://priya.tech',
         'educations': [
             {
                 'id': '1',
@@ -125,7 +125,7 @@ STUDENTS_DATA = [
                 'id': '1',
                 'title': 'Multilingual Medical NLP Summarizer',
                 'technologies': 'Python, PyTorch, HuggingFace, FastAPI, React',
-                'project_url': 'https://github.com/priyanair-ai/med-summarizer',
+                'project_url': 'https://github.com/priya-ai/med-summarizer',
                 'description': 'Built an abstractive clinical record summarization pipeline using fine-tuned transformer architectures.'
             }
         ],
@@ -140,8 +140,8 @@ STUDENTS_DATA = [
         ]
     },
     {
-        'email': 'rohit.verma@internhub.com',
-        'full_name': 'Rohit Verma',
+        'email': 'rohit@internhub.com',
+        'full_name': 'Rohit',
         'phone': '+91 9711223344',
         'college_name': 'IIIT Hyderabad',
         'department': 'Computer Science & Engineering',
@@ -152,9 +152,9 @@ STUDENTS_DATA = [
         'career_interests': 'Backend Systems, Distributed Databases, Cloud Infrastructure',
         'technical_skills': 'Python, Flask, Django, PostgreSQL, Redis, Microservices, System Design, Algorithms, Docker, Linux, SQL',
         'soft_skills': 'Systems Thinking, Code Review, Fast Troubleshooting',
-        'github_url': 'https://github.com/rohitverma-code',
-        'linkedin_url': 'https://linkedin.com/in/rohitverma-code',
-        'portfolio_url': 'https://rohitverma.dev',
+        'github_url': 'https://github.com/rohit-code',
+        'linkedin_url': 'https://linkedin.com/in/rohit-code',
+        'portfolio_url': 'https://rohit.dev',
         'educations': [
             {
                 'id': '1',
@@ -183,7 +183,7 @@ STUDENTS_DATA = [
                 'id': '1',
                 'title': 'Distributed Key-Value Store in Python',
                 'technologies': 'Python, Raft Consensus, gRPC, Socket Programming',
-                'project_url': 'https://github.com/rohitverma-code/distributed-kv',
+                'project_url': 'https://github.com/rohit-code/distributed-kv',
                 'description': 'Implemented Raft consensus algorithm for fault-tolerant state machine replication across cluster nodes.'
             }
         ],
@@ -198,8 +198,8 @@ STUDENTS_DATA = [
         ]
     },
     {
-        'email': 'ananya.iyer@internhub.com',
-        'full_name': 'Ananya Iyer',
+        'email': 'ananya@internhub.com',
+        'full_name': 'Ananya',
         'phone': '+91 9940112233',
         'college_name': 'College of Engineering Guindy (Anna University)',
         'department': 'Information Technology',
@@ -210,9 +210,9 @@ STUDENTS_DATA = [
         'career_interests': 'Frontend Development, UI/UX Systems, Cloud Web Applications',
         'technical_skills': 'React, TypeScript, Node.js, Next.js, REST APIs, SQL, Docker, Git, Cloud Computing, HTML/CSS, Tailwind CSS',
         'soft_skills': 'Design Sensitivity, Cross-functional Communication, Empathy',
-        'github_url': 'https://github.com/ananyaiyer-ui',
-        'linkedin_url': 'https://linkedin.com/in/ananyaiyer-ui',
-        'portfolio_url': 'https://ananyaiyer.com',
+        'github_url': 'https://github.com/ananya-ui',
+        'linkedin_url': 'https://linkedin.com/in/ananya-ui',
+        'portfolio_url': 'https://ananya.com',
         'educations': [
             {
                 'id': '1',
@@ -241,7 +241,7 @@ STUDENTS_DATA = [
                 'id': '1',
                 'title': 'Collaborative Real-time Canvas',
                 'technologies': 'React, TypeScript, WebSockets, WebGL, Tailwind',
-                'project_url': 'https://github.com/ananyaiyer-ui/realtime-canvas',
+                'project_url': 'https://github.com/ananya-ui/realtime-canvas',
                 'description': 'Built an interactive collaborative whiteboard featuring 60fps latency-free stroke synchronization.'
             }
         ],
@@ -256,8 +256,8 @@ STUDENTS_DATA = [
         ]
     },
     {
-        'email': 'karthik.rajan@internhub.com',
-        'full_name': 'Karthik Rajan',
+        'email': 'karthik@internhub.com',
+        'full_name': 'Karthik',
         'phone': '+91 9443123456',
         'college_name': 'PSG College of Technology, Coimbatore',
         'department': 'Software Systems',
@@ -268,9 +268,9 @@ STUDENTS_DATA = [
         'career_interests': 'Enterprise Software, Database Optimization, Microservices',
         'technical_skills': 'Python, Java, Spring Boot, MySQL, REST APIs, Git, Docker, HTML/CSS, Linux, SQL',
         'soft_skills': 'Persistence, Active Listening, Team Player',
-        'github_url': 'https://github.com/karthikrajan-dev',
-        'linkedin_url': 'https://linkedin.com/in/karthikrajan-dev',
-        'portfolio_url': 'https://karthikrajan.me',
+        'github_url': 'https://github.com/karthik-dev',
+        'linkedin_url': 'https://linkedin.com/in/karthik-dev',
+        'portfolio_url': 'https://karthik.me',
         'educations': [
             {
                 'id': '1',
@@ -288,7 +288,7 @@ STUDENTS_DATA = [
                 'id': '1',
                 'title': 'Campus Placement Automation Portal',
                 'technologies': 'Python, Flask, MySQL, Bootstrap',
-                'project_url': 'https://github.com/karthikrajan-dev/placement-portal',
+                'project_url': 'https://github.com/karthik-dev/placement-portal',
                 'description': 'Developed an end-to-end recruitment tracker for college campus placement drives managing 1,200+ students.'
             }
         ],
@@ -303,8 +303,8 @@ STUDENTS_DATA = [
         ]
     },
     {
-        'email': 'sneha.kulkarni@internhub.com',
-        'full_name': 'Sneha Kulkarni',
+        'email': 'sneha@internhub.com',
+        'full_name': 'Sneha',
         'phone': '+91 9822334455',
         'college_name': 'College of Engineering Pune (COEP)',
         'department': 'Computer Engineering',
@@ -315,9 +315,9 @@ STUDENTS_DATA = [
         'career_interests': 'Data Science, Machine Learning, Business Intelligence',
         'technical_skills': 'Python, Machine Learning, Scikit-Learn, PowerBI, Tableau, SQL, Statistics, Pandas, NumPy, Deep Learning Basics',
         'soft_skills': 'Data Storytelling, Stakeholder Communication, Critical Thinking',
-        'github_url': 'https://github.com/snehakulkarni-ds',
-        'linkedin_url': 'https://linkedin.com/in/snehakulkarni-ds',
-        'portfolio_url': 'https://snehakulkarni.info',
+        'github_url': 'https://github.com/sneha-ds',
+        'linkedin_url': 'https://linkedin.com/in/sneha-ds',
+        'portfolio_url': 'https://sneha.info',
         'educations': [
             {
                 'id': '1',
@@ -346,7 +346,7 @@ STUDENTS_DATA = [
                 'id': '1',
                 'title': 'Predictive Health Risk Assessment Model',
                 'technologies': 'Python, Scikit-Learn, Streamlit, Pandas, Seaborn',
-                'project_url': 'https://github.com/snehakulkarni-ds/health-risk-ml',
+                'project_url': 'https://github.com/sneha-ds/health-risk-ml',
                 'description': 'Trained classification pipelines on public health cohorts to predict cardiovascular onset factors.'
             }
         ],
@@ -361,8 +361,8 @@ STUDENTS_DATA = [
         ]
     },
     {
-        'email': 'aditya.menon@internhub.com',
-        'full_name': 'Aditya Menon',
+        'email': 'aditya@internhub.com',
+        'full_name': 'Aditya',
         'phone': '+91 9895112233',
         'college_name': 'National Institute of Technology Calicut (NITC)',
         'department': 'Electronics & Communication Engineering',
@@ -373,9 +373,9 @@ STUDENTS_DATA = [
         'career_interests': 'Edge Computing, Robotics, Embedded Systems, Machine Learning',
         'technical_skills': 'C++, Python, Embedded Systems, Linux, Git, Algorithms, Data Structures, OpenCV, Machine Learning Basics',
         'soft_skills': 'Hands-on Prototyping, Technical Curiosity, Reliability',
-        'github_url': 'https://github.com/adityamenon-embed',
-        'linkedin_url': 'https://linkedin.com/in/adityamenon-embed',
-        'portfolio_url': 'https://adityamenon.dev',
+        'github_url': 'https://github.com/aditya-embed',
+        'linkedin_url': 'https://linkedin.com/in/aditya-embed',
+        'portfolio_url': 'https://aditya.dev',
         'educations': [
             {
                 'id': '1',
@@ -393,7 +393,7 @@ STUDENTS_DATA = [
                 'id': '1',
                 'title': 'Autonomous Line & Obstacle Navigating Bot',
                 'technologies': 'C++, ROS2, OpenCV, Raspberry Pi, Python',
-                'project_url': 'https://github.com/adityamenon-embed/autonomous-bot',
+                'project_url': 'https://github.com/aditya-embed/autonomous-bot',
                 'description': 'Built an autonomous obstacle-avoiding mobile robot utilizing ROS2 nodes and camera-based edge inference.'
             }
         ],
@@ -408,8 +408,8 @@ STUDENTS_DATA = [
         ]
     },
     {
-        'email': 'pooja.reddy@internhub.com',
-        'full_name': 'Pooja Reddy',
+        'email': 'pooja@internhub.com',
+        'full_name': 'Pooja',
         'phone': '+91 9988776655',
         'college_name': 'Osmania University College of Engineering',
         'department': 'Artificial Intelligence & Machine Learning',
@@ -420,9 +420,9 @@ STUDENTS_DATA = [
         'career_interests': 'AI Engineering, Full Stack Web Development, Cloud Computing',
         'technical_skills': 'Python, Data Analytics, Flask, SQL, HTML/CSS, JavaScript, Seaborn, Matplotlib, Git, REST APIs',
         'soft_skills': 'Fast Learner, Collaborative Mindset, Creative Problem Solving',
-        'github_url': 'https://github.com/poojareddy-ai',
-        'linkedin_url': 'https://linkedin.com/in/poojareddy-ai',
-        'portfolio_url': 'https://poojareddy.me',
+        'github_url': 'https://github.com/pooja-ai',
+        'linkedin_url': 'https://linkedin.com/in/pooja-ai',
+        'portfolio_url': 'https://pooja.me',
         'educations': [
             {
                 'id': '1',
@@ -440,7 +440,7 @@ STUDENTS_DATA = [
                 'id': '1',
                 'title': 'Smart Expense Tracker with Analytics',
                 'technologies': 'Python, Flask, SQLite, Chart.js',
-                'project_url': 'https://github.com/poojareddy-ai/smart-expenses',
+                'project_url': 'https://github.com/pooja-ai/smart-expenses',
                 'description': 'Created a dynamic budget analyzer featuring automatic recurring expense categorizations and interactive monthly spending trends.'
             }
         ],
@@ -455,8 +455,8 @@ STUDENTS_DATA = [
         ]
     },
     {
-        'email': 'vikram.singh@internhub.com',
-        'full_name': 'Vikram Singh',
+        'email': 'vikram@internhub.com',
+        'full_name': 'Vikram',
         'phone': '+91 9811223344',
         'college_name': 'Delhi Technological University (DTU)',
         'department': 'Software Engineering',
@@ -467,9 +467,9 @@ STUDENTS_DATA = [
         'career_interests': 'DevOps, Cloud Computing, Site Reliability Engineering',
         'technical_skills': 'Python, Docker, Kubernetes, Cloud Computing, Microservices, Linux, CI/CD, Terraform, SQL, Git, REST APIs',
         'soft_skills': 'Incident Management, System Resilience, Team Mentorship',
-        'github_url': 'https://github.com/vikramsingh-cloud',
-        'linkedin_url': 'https://linkedin.com/in/vikramsingh-cloud',
-        'portfolio_url': 'https://vikramsingh.cloud',
+        'github_url': 'https://github.com/vikram-cloud',
+        'linkedin_url': 'https://linkedin.com/in/vikram-cloud',
+        'portfolio_url': 'https://vikram.cloud',
         'educations': [
             {
                 'id': '1',
@@ -498,7 +498,7 @@ STUDENTS_DATA = [
                 'id': '1',
                 'title': 'Multi-Environment GitOps Deployment Operator',
                 'technologies': 'Kubernetes, Go, Python, Docker, GitHub Actions',
-                'project_url': 'https://github.com/vikramsingh-cloud/gitops-operator',
+                'project_url': 'https://github.com/vikram-cloud/gitops-operator',
                 'description': 'Architected a lightweight Kubernetes operator for continuous cluster configuration synchronization.'
             }
         ],
@@ -513,8 +513,8 @@ STUDENTS_DATA = [
         ]
     },
     {
-        'email': 'meera.joshi@internhub.com',
-        'full_name': 'Meera Joshi',
+        'email': 'meera@internhub.com',
+        'full_name': 'Meera',
         'phone': '+91 9820123456',
         'college_name': 'Veermata Jijabai Technological Institute (VJTI Mumbai)',
         'department': 'Computer Engineering',
@@ -525,9 +525,9 @@ STUDENTS_DATA = [
         'career_interests': 'Mobile Engineering, Full Stack Web, Interactive Interfaces',
         'technical_skills': 'React, JavaScript, Python, REST APIs, Git, HTML/CSS, SQL, Docker, Mobile Development Basics',
         'soft_skills': 'User-Centered Thinking, Visual Design, Adaptability',
-        'github_url': 'https://github.com/meerajoshi-app',
-        'linkedin_url': 'https://linkedin.com/in/meerajoshi-app',
-        'portfolio_url': 'https://meerajoshi.design',
+        'github_url': 'https://github.com/meera-app',
+        'linkedin_url': 'https://linkedin.com/in/meera-app',
+        'portfolio_url': 'https://meera.design',
         'educations': [
             {
                 'id': '1',
@@ -545,7 +545,7 @@ STUDENTS_DATA = [
                 'id': '1',
                 'title': 'Student Mental Wellness & Habit Mobile Tracker',
                 'technologies': 'React Native, Node.js, Express, MongoDB',
-                'project_url': 'https://github.com/meerajoshi-app/wellness-tracker',
+                'project_url': 'https://github.com/meera-app/wellness-tracker',
                 'description': 'Designed and released a clean cross-platform wellness application with 1,500+ active student users.'
             }
         ],
@@ -567,15 +567,26 @@ ADMIN_PASSWORD = 'admin123'
 
 
 def seed_mongo():
-    # 0. Sanitize legacy student records to ensure NO Sharma sub-name exists anywhere
+    # 0. Sanitize existing student records: remove all surnames from email & full_name
     try:
-        legacy_records = list(students_col.find({'full_name': {'$regex': 'sharma', '$options': 'i'}}))
-        for rec in legacy_records:
-            sanitized = rec['full_name']
-            sanitized = sanitized.replace('Sharma', 'Patel').replace('sharma', 'patel')
-            students_col.update_one({'_id': rec['_id']}, {'$set': {'full_name': sanitized}})
+        # Update any emails with dot-surnames (e.g. priya.nair@internhub.com -> priya@internhub.com)
+        for u in list(users_col.find({'role': 'student'})):
+            old_email = u.get('email', '')
+            if '@' in old_email and '.' in old_email.split('@')[0]:
+                prefix = old_email.split('@')[0].split('.')[0]
+                domain = old_email.split('@')[1]
+                new_email = f"{prefix}@{domain}"
+                if not users_col.find_one({'email': new_email, '_id': {'$ne': u['_id']}}):
+                    users_col.update_one({'_id': u['_id']}, {'$set': {'email': new_email}})
+
+        # Update full_name to single first name (remove any surnames)
+        for s in list(students_col.find()):
+            name = s.get('full_name', '').strip()
+            if ' ' in name:
+                first_name_only = name.split()[0]
+                students_col.update_one({'_id': s['_id']}, {'$set': {'full_name': first_name_only}})
     except Exception as e:
-        print(f"Sanitization note: {e}")
+        print(f"Surname cleanup note: {e}")
 
     # 1. Seed or Verify all 10 Companies and their respective internships
     _seed_companies_and_internships()
@@ -637,6 +648,16 @@ def seed_mongo():
                     'applied_at': datetime.utcnow() - timedelta(days=(idx * 2) % 14 + 1),
                     'updated_at': datetime.utcnow()
                 })
+
+    # Allow logging in with either aarav@internhub.com or student@internhub.com (both have zero surnames)
+    if not users_col.find_one({'email': 'student@internhub.com'}):
+        u_alias = MongoHelper.create_user('student@internhub.com', 'student123', 'student')
+        aarav_sp = students_col.find_one({'full_name': 'Aarav'})
+        if aarav_sp:
+            alias_doc = dict(aarav_sp)
+            alias_doc.pop('_id', None)
+            alias_doc['user_id'] = str(u_alias['id'])
+            students_col.insert_one(alias_doc)
 
     print(f"MongoDB seed verified! Total Admins: {users_col.count_documents({'role': 'admin'})}, Total Companies: {companies_col.count_documents({})}, Total Students: {students_col.count_documents({})}, Total Internships: {internships_col.count_documents({})}")
 

@@ -194,15 +194,15 @@ def seed_database():
     db.session.flush()
 
     # 4. STUDENT USERS & DYNAMIC RESUMES
-    # Student 1: Aarav Patel (Primary Demo Student)
-    s1_user = User(email='student@internhub.com', role='student')
+    # Student 1: Aarav (Primary Demo Student)
+    s1_user = User(email='aarav@internhub.com', role='student')
     s1_user.set_password('student123')
     db.session.add(s1_user)
     db.session.flush()
 
     s1_profile = StudentProfile(
         user_id=s1_user.id,
-        full_name="Aarav Patel",
+        full_name="Aarav",
         phone="+91 9123456780",
         college_name="National Institute of Technology (NIT)",
         department="Computer Science & Engineering",
@@ -470,7 +470,7 @@ def seed_database():
     notif_c1 = Notification(
         user_id=c1_user.id,
         title="New High-Match Applicant 🎯",
-        message="Aarav Patel (NIT, CGPA 8.85) applied for AI & Machine Learning Research Intern with 88% Match score.",
+        message="Aarav (NIT, CGPA 8.85) applied for AI & Machine Learning Research Intern with 88% Match score.",
         category="info",
         link="/company/applicants",
         is_read=False
