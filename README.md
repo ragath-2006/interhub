@@ -76,7 +76,7 @@ Log in directly or use the 1-click demo buttons on the [Login Page](http://127.0
 
 | Role | Email | Password | Details |
 | :--- | :--- | :--- | :--- |
-| **Student** | `student@internhub.com` | `student123` | **Rahul Sharma** (NIT CSE, CGPA 8.85, Dynamic Resume + Completed Internship at Swiggy with Verified Review) |
+| **Student** | `aarav@email.com` *(or `student@email.com`)* | `student123` | **Aarav** (NIT CSE, CGPA 8.85, Dynamic Resume + Completed Internship at Swiggy with Verified Review) |
 | **Employer** | `hr@google.com` | `company123` | **Google India Tech** (AI/ML Research Internships & Applicants) |
 | **Employer** | `talent@microsoft.com` | `company123` | **Microsoft IDC** (Full Stack Software Engineering) |
 | **Employer** | `careers@swiggy.in` | `company123` | **Swiggy Engineering** (Backend Systems & Data Analytics) |

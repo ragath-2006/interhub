@@ -7,10 +7,10 @@ from db_mongo import (
 )
 from ml_engine import shortlist_predictor
 
-# 10 Diverse Indian tech students with single names (NO surnames in name or email)
+# 10 Diverse Indian tech students with single names (NO surnames in name or email, all @email.com)
 STUDENTS_DATA = [
     {
-        'email': 'aarav@internhub.com',
+        'email': 'aarav@email.com',
         'full_name': 'Aarav',
         'phone': '+91 9123456780',
         'college_name': 'National Institute of Technology (NIT)',
@@ -82,7 +82,7 @@ STUDENTS_DATA = [
         ]
     },
     {
-        'email': 'priya@internhub.com',
+        'email': 'priya@email.com',
         'full_name': 'Priya',
         'phone': '+91 9845123456',
         'college_name': 'Birla Institute of Technology and Science (BITS Pilani)',
@@ -140,7 +140,7 @@ STUDENTS_DATA = [
         ]
     },
     {
-        'email': 'rohit@internhub.com',
+        'email': 'rohit@email.com',
         'full_name': 'Rohit',
         'phone': '+91 9711223344',
         'college_name': 'IIIT Hyderabad',
@@ -198,7 +198,7 @@ STUDENTS_DATA = [
         ]
     },
     {
-        'email': 'ananya@internhub.com',
+        'email': 'ananya@email.com',
         'full_name': 'Ananya',
         'phone': '+91 9940112233',
         'college_name': 'College of Engineering Guindy (Anna University)',
@@ -256,7 +256,7 @@ STUDENTS_DATA = [
         ]
     },
     {
-        'email': 'karthik@internhub.com',
+        'email': 'karthik@email.com',
         'full_name': 'Karthik',
         'phone': '+91 9443123456',
         'college_name': 'PSG College of Technology, Coimbatore',
@@ -303,7 +303,7 @@ STUDENTS_DATA = [
         ]
     },
     {
-        'email': 'sneha@internhub.com',
+        'email': 'sneha@email.com',
         'full_name': 'Sneha',
         'phone': '+91 9822334455',
         'college_name': 'College of Engineering Pune (COEP)',
@@ -361,7 +361,7 @@ STUDENTS_DATA = [
         ]
     },
     {
-        'email': 'aditya@internhub.com',
+        'email': 'aditya@email.com',
         'full_name': 'Aditya',
         'phone': '+91 9895112233',
         'college_name': 'National Institute of Technology Calicut (NITC)',
@@ -408,7 +408,7 @@ STUDENTS_DATA = [
         ]
     },
     {
-        'email': 'pooja@internhub.com',
+        'email': 'pooja@email.com',
         'full_name': 'Pooja',
         'phone': '+91 9988776655',
         'college_name': 'Osmania University College of Engineering',
@@ -455,7 +455,7 @@ STUDENTS_DATA = [
         ]
     },
     {
-        'email': 'vikram@internhub.com',
+        'email': 'vikram@email.com',
         'full_name': 'Vikram',
         'phone': '+91 9811223344',
         'college_name': 'Delhi Technological University (DTU)',
@@ -513,7 +513,7 @@ STUDENTS_DATA = [
         ]
     },
     {
-        'email': 'meera@internhub.com',
+        'email': 'meera@email.com',
         'full_name': 'Meera',
         'phone': '+91 9820123456',
         'college_name': 'Veermata Jijabai Technological Institute (VJTI Mumbai)',
@@ -567,17 +567,25 @@ ADMIN_PASSWORD = 'admin123'
 
 
 def seed_mongo():
-    # 0. Sanitize existing student records: remove all surnames from email & full_name
+    # 0. Sanitize existing student records: remove all surnames from email & full_name, and migrate student domains to @email.com
     try:
-        # Update any emails with dot-surnames (e.g. priya.nair@internhub.com -> priya@internhub.com)
+        # Convert any existing student emails to @email.com and strip surnames
         for u in list(users_col.find({'role': 'student'})):
             old_email = u.get('email', '')
-            if '@' in old_email and '.' in old_email.split('@')[0]:
-                prefix = old_email.split('@')[0].split('.')[0]
-                domain = old_email.split('@')[1]
-                new_email = f"{prefix}@{domain}"
-                if not users_col.find_one({'email': new_email, '_id': {'$ne': u['_id']}}):
-                    users_col.update_one({'_id': u['_id']}, {'$set': {'email': new_email}})
+            if '@' in old_email:
+                prefix = old_email.split('@')[0]
+                if '.' in prefix:
+                    prefix = prefix.split('.')[0]
+                new_email = f"{prefix}@email.com"
+                if old_email != new_email:
+                    collision = users_col.find_one({'email': new_email, '_id': {'$ne': u['_id']}})
+                    if collision:
+                        users_col.delete_one({'_id': u['_id']})
+                    else:
+                        users_col.update_one({'_id': u['_id']}, {'$set': {'email': new_email}})
+
+        # Remove any student users lingering on @internhub.com domain
+        users_col.delete_many({'role': 'student', 'email': {'$regex': r'@internhub\.com$'}})
 
         # Update full_name to single first name (remove any surnames)
         for s in list(students_col.find()):
@@ -586,7 +594,7 @@ def seed_mongo():
                 first_name_only = name.split()[0]
                 students_col.update_one({'_id': s['_id']}, {'$set': {'full_name': first_name_only}})
     except Exception as e:
-        print(f"Surname cleanup note: {e}")
+        print(f"Student sanitization note: {e}")
 
     # 1. Seed or Verify all 10 Companies and their respective internships
     _seed_companies_and_internships()
@@ -649,9 +657,9 @@ def seed_mongo():
                     'updated_at': datetime.utcnow()
                 })
 
-    # Allow logging in with either aarav@internhub.com or student@internhub.com (both have zero surnames)
-    if not users_col.find_one({'email': 'student@internhub.com'}):
-        u_alias = MongoHelper.create_user('student@internhub.com', 'student123', 'student')
+    # Allow logging in with either aarav@email.com or student@email.com (both have zero surnames)
+    if not users_col.find_one({'email': 'student@email.com'}):
+        u_alias = MongoHelper.create_user('student@email.com', 'student123', 'student')
         aarav_sp = students_col.find_one({'full_name': 'Aarav'})
         if aarav_sp:
             alias_doc = dict(aarav_sp)

@@ -195,7 +195,7 @@ def seed_database():
 
     # 4. STUDENT USERS & DYNAMIC RESUMES
     # Student 1: Aarav (Primary Demo Student)
-    s1_user = User(email='aarav@internhub.com', role='student')
+    s1_user = User(email='aarav@email.com', role='student')
     s1_user.set_password('student123')
     db.session.add(s1_user)
     db.session.flush()
@@ -285,15 +285,15 @@ def seed_database():
         credential_url="https://aws.amazon.com/verification/AWS-CP-RAHUL"
     ))
 
-    # Student 2: Priya Patel (Data Science Focus)
-    s2_user = User(email='priya@internhub.com', role='student')
+    # Student 2: Priya (Data Science Focus)
+    s2_user = User(email='priya@email.com', role='student')
     s2_user.set_password('student123')
     db.session.add(s2_user)
     db.session.flush()
 
     s2_profile = StudentProfile(
         user_id=s2_user.id,
-        full_name="Priya Patel",
+        full_name="Priya",
         phone="+91 9887766554",
         college_name="IIT Madras",
         department="Data Science & Artificial Intelligence",
@@ -326,15 +326,15 @@ def seed_database():
         description="Trained domain-adapted BERT model to automatically generate concise summaries of clinical reports with 92% ROUGE-1 score."
     ))
 
-    # Student 3: Rohit Verma (Web Dev Focus)
-    s3_user = User(email='rohit@internhub.com', role='student')
+    # Student 3: Rohit (Web Dev Focus)
+    s3_user = User(email='rohit@email.com', role='student')
     s3_user.set_password('student123')
     db.session.add(s3_user)
     db.session.flush()
 
     s3_profile = StudentProfile(
         user_id=s3_user.id,
-        full_name="Rohit Verma",
+        full_name="Rohit",
         phone="+91 9776655443",
         college_name="Delhi Technological University (DTU)",
         department="Information Technology",
