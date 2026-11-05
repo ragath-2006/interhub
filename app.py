@@ -82,12 +82,15 @@ def create_notification(user_id, title, message, category='info', link=None):
 # ----------------- Public Routes ----------------- #
 @app.route('/')
 def index():
-    featured_cursor = internships_col.find({'is_active': True}).sort('created_at', -1).limit(6)
+    featured_cursor = internships_col.find({'is_active': True}).sort('created_at', -1)
     featured_internships = []
     for item in featured_cursor:
         item = MongoHelper.format_doc(item)
-        item['company'] = MongoHelper.get_company_by_id(item['company_id'])
-        featured_internships.append(item)
+        if not item.get('is_expired'):
+            item['company'] = MongoHelper.get_company_by_id(item['company_id'])
+            featured_internships.append(item)
+            if len(featured_internships) >= 6:
+                break
 
     companies_cursor = companies_col.find({'is_verified': True}).limit(8)
     companies = [MongoHelper.get_company_by_id(c['_id']) for c in companies_cursor]
@@ -172,7 +175,7 @@ def internships():
                 'internship_id': str(item['id']),
                 'student_id': str(student_profile['id'])
             }) is not None
-            if match_info:
+            if match_info and not item.get('is_expired'):
                 s_prob = match_info.get('rf_probability', 0.0)
                 if s_prob > max_score:
                     max_score = s_prob
@@ -433,7 +436,7 @@ def student_dashboard():
 
     recommendations = []
     for item in all_internships:
-        if str(item['id']) in applied_job_ids:
+        if str(item['id']) in applied_job_ids or item.get('is_expired'):
             continue
         scores = shortlist_predictor.predict_shortlist_probability(profile, item)
         recommendations.append({
@@ -600,6 +603,14 @@ def apply_internship(internship_id):
     if not internship:
         flash('Internship not found.', 'danger')
         return redirect(url_for('internships'))
+
+    if internship.get('is_expired'):
+        flash('The submission deadline for this internship has passed. Applications are closed.', 'danger')
+        return redirect(url_for('internship_detail', internship_id=internship_id))
+
+    if not internship.get('is_active', True):
+        flash('This internship is currently closed.', 'warning')
+        return redirect(url_for('internship_detail', internship_id=internship_id))
 
     user = get_current_user()
     profile = user['student_profile']
@@ -1094,11 +1105,8 @@ def toggle_company_verification(id):
 @app.route('/admin/internship/<id>/toggle', methods=['POST'])
 @role_required('admin')
 def admin_toggle_internship(id):
-    job = internships_col.find_one({'_id': MongoHelper.to_id(id)})
-    if job:
-        new_status = not job.get('is_active', True)
-        internships_col.update_one({'_id': job['_id']}, {'$set': {'is_active': new_status}})
-        flash(f"Internship '{job.get('title')}' status updated to {'Active' if new_status else 'Closed'}.", 'info')
+    # Activation/deactivation by admin removed per requirement
+    flash("Admin activation toggle has been disabled. Status is determined automatically by deadline or company.", "info")
     return redirect(url_for('admin_dashboard'))
 
 @app.route('/admin/company/<id>/delete', methods=['POST'])

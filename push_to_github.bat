@@ -9,7 +9,7 @@ echo Target Repository: https://github.com/ragath-2006/interhub.git
 echo.
 echo Staging and committing changes...
 git add .
-git commit -m "Update student email addresses to @email.com domain"
+git commit -m "Implement automatic internship deadline expiration and remove admin activation toggle"
 echo.
 echo Pushing files to GitHub now, please wait...
 echo ---------------------------------------------------------------------

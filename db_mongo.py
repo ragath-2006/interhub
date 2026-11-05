@@ -41,10 +41,23 @@ class MongoHelper:
             return val
 
     @staticmethod
+    def is_internship_expired(deadline_str):
+        if not deadline_str:
+            return False
+        try:
+            clean_date = str(deadline_str).strip()[:10]
+            deadline_date = datetime.strptime(clean_date, "%Y-%m-%d").date()
+            return deadline_date < datetime.utcnow().date()
+        except Exception:
+            return False
+
+    @staticmethod
     def format_doc(doc):
         if not doc:
             return None
         doc['id'] = str(doc['_id'])
+        if 'deadline' in doc:
+            doc['is_expired'] = MongoHelper.is_internship_expired(doc.get('deadline'))
         return doc
 
     @staticmethod

@@ -551,25 +551,22 @@
                                             </span>
                                         </td>
                                         <td>
-                                            {% if job.is_active %}
+                                            {% if job.is_expired %}
+                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
+                                                    <i class="bi bi-calendar-x me-1"></i> Expired
+                                                </span>
+                                            {% elif job.is_active %}
                                                 <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
                                                     <i class="bi bi-check-circle me-1"></i> Active
                                                 </span>
                                             {% else %}
                                                 <span class="badge bg-secondary-subtle text-secondary border px-2 py-1">
-                                                    Closed
+                                                    <i class="bi bi-dash-circle me-1"></i> Inactive
                                                 </span>
                                             {% endif %}
                                         </td>
                                         <td class="text-end">
                                             <div class="d-inline-flex gap-1">
-                                                <!-- Toggle Internship Active / Closed -->
-                                                <form action="{{ url_for('admin_toggle_internship', id=job.id) }}" method="POST" class="d-inline">
-                                                    <button type="submit" class="btn btn-outline-secondary btn-sm">
-                                                        {% if job.is_active %}Close{% else %}Activate{% endif %}
-                                                    </button>
-                                                </form>
-
                                                 <!-- Delete Internship -->
                                                 <form action="{{ url_for('admin_delete_internship', id=job.id) }}" method="POST" class="d-inline"
                                                       onsubmit="return confirm('Are you sure you want to delete internship \'{{ job.title }}\'? This will also delete all associated student applications.');">

@@ -89,6 +89,11 @@
                                     {% if 'unpaid' in job.stipend|lower or 'unstipended' in job.stipend|lower %}
                                         <span class="badge bg-secondary-subtle text-secondary fw-semibold">Unpaid / Experience</span>
                                     {% endif %}
+                                    {% if job.is_expired %}
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-semibold">
+                                            <i class="bi bi-calendar-x me-1"></i> Expired
+                                        </span>
+                                    {% endif %}
                                 </div>
                                 
                                 {% if match %}
@@ -157,7 +162,11 @@
                                 <a href="{{ url_for('internship_detail', internship_id=job.id) }}" class="btn btn-outline-secondary btn-sm">
                                     Details
                                 </a>
-                                {% if item.has_applied %}
+                                {% if job.is_expired %}
+                                    <button class="btn btn-secondary btn-sm" disabled title="Deadline has passed">
+                                        <i class="bi bi-clock-history"></i> Expired
+                                    </button>
+                                {% elif item.has_applied %}
                                     <button class="btn btn-secondary btn-sm" disabled>
                                         <i class="bi bi-check2-circle"></i> Applied
                                     </button>

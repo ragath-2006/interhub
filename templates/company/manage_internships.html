@@ -50,7 +50,9 @@
                                     </a>
                                 </td>
                                 <td>
-                                    {% if job.is_active %}
+                                    {% if job.is_expired %}
+                                        <span class="badge bg-danger-subtle text-danger"><i class="bi bi-calendar-x me-1"></i> Expired (Deadline: {{ job.deadline }})</span>
+                                    {% elif job.is_active %}
                                         <span class="badge bg-success-subtle text-success">Active & Receiving Applications</span>
                                     {% else %}
                                         <span class="badge bg-secondary-subtle text-secondary">Closed / Inactive</span>
